@@ -1,0 +1,14 @@
+name: synth_actors
+channels:
+  - defaults
+  - anaconda
+dependencies:
+  - python=3.11.9
+  - pandas
+  - numpy
+  - pip
+  - pip:
+    - OpenAI
+    - pydantic
+    - toml
+    - instructor

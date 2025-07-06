@@ -1,0 +1,11 @@
+*.txt
+*.csv
+*.md
+*.html
+
+
+.DS_Store
+!update_library.py
+
+# Ignore all files in the vignette_library directory except update_library.py
+# This allows the script to be version controlled while ignoring other files
