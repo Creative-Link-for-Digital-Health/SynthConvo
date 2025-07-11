@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloning & Usage Guide - SynthConvo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      color: #1B365D;
+    }
+    header {
+      background: #0033A0;
+      color: white;
+      padding: 2rem 1rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      margin: 0;
+      font-family: 'Saya FY W04 Black', sans-serif;
+    }
+    .logo-wrapper {
+      position: absolute;
+      top: 20px;
+      left: calc((100% - 900px) / 2); /* aligns with container left */
+    }
+    .logo-wrapper img {
+      height: 80px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+      line-height: 1.7;
+    }
+    h2 {
+      font-size: 1.4rem;
+      border-left: 4px solid #0033A0;
+      padding-left: 0.5rem;
+      margin-top: 2.5rem;
+    }
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+    a {
+      color: #1E8AFF;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: #DCDDDE;
+      font-size: 0.9rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-wrapper">
+      <img src="https://raw.githubusercontent.com/Creative-Link-for-Digital-Health/Creative-Link-Branding/main/logo_for_social_media_300X300.png" alt="Creative Link Logo">
+    </div>
+    <h1>SynthConvo - Cloning & Usage Guide</h1>
+  </header>
+
+  <div class="container">
+    <p>This guide provides instructions for cloning and running the <strong>SynthConvo</strong> repository on your local machine. Make sure you have <strong>Node.js</strong> and <strong>Git</strong> installed before proceeding.</p>
+
+    <h2>1. Cloning the Repository</h2>
+    <ol>
+      <li>Open a terminal window on your computer.</li>
+      <li>Navigate to the directory where you want to store the project.</li>
+      <li>Run the following command:
+        <pre><code>git clone https://github.com/Creative-Link-for-Digital-Health/SynthConvo.git</code></pre>
+      </li>
+      <li>Navigate into the project folder:
+        <pre><code>cd SynthConvo</code></pre>
+      </li>
+    </ol>
+
+    <h2>2. Installing Dependencies</h2>
+    <ol>
+      <li>Ensure you have Node.js installed: <code>node -v</code></li>
+      <li>Install project dependencies using:
+        <pre><code>npm install</code></pre>
+      </li>
+    </ol>
+
+    <h2>3. Running the Application</h2>
+    <ol>
+      <li>To start the app in development mode, run:
+        <pre><code>npm run dev</code></pre>
+      </li>
+      <li>The application will likely open in your browser at <code>http://localhost:3000</code> or similar.
+      </li>
+    </ol>
+
+    <h2>4. Usage Overview</h2>
+    <ul>
+      <li>The app generates realistic conversation examples using predefined personas and scenarios.</li>
+      <li>Use the web interface to select or customize a persona, then initiate a conversation thread.</li>
+      <li>Outputs can be copied or exported for testing, demos, or study purposes.</li>
+    </ul>
+
+    <p><a href="index.html">← Back to Main Page</a></p>
+  </div>
+
+  <footer>
+    Authors / Contributors: Creative Link for Digital Health Team<br>
+    <span id="updated-date">Updated on: <script>document.write(new Date().toDateString());</script></span>
+  </footer>
+</body>
+</html>
