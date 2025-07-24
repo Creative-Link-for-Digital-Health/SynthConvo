@@ -1,6 +1,8 @@
 # Conversation Generator - Question/Answer Turns for Model Eval and Fine-tuning
 
-Useful for generating synthetic personas
+Use for generating synthetic conversations for system testing, development, finetuning, training and all sorts of other tasks where synthetic personas conversing with each other are useful ;)
+
+![alt text](assets/synth_convo_diagram.png)
 
 ## TODO 
 + add example vignettes to the library
