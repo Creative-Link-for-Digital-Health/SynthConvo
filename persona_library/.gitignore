@@ -1,0 +1,7 @@
+*.txt
+*.csv
+*.md
+*.html
+
+
+.DS_Store
