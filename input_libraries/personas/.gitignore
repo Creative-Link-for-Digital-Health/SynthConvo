@@ -2,4 +2,7 @@
 !.gitignore
 !*.example.json
 !/prompts/
+
+
+### ADD ANY PERSONA PROMPT FILES HERE THAT YOU WANT TO BE PUBLIC 
 !/prompts/*.example.txt
