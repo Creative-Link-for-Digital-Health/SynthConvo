@@ -31,7 +31,7 @@
         "preferred_citation": "Example, S. (2025). Example Title [Training vignette]. Repository, v0.2.0.",
         "doi": "10.1234/sstr.marcus.001 (if available)",
         "repository_name": "Social Services Training Repository",
-        "permanent_url": "https://training-repo.example.org/vignettes/marcus-001",
+        "permanent_url": "https://github.com/Creative-Link-for-Digital-Health/SynthConvo/blob/main/input_libraries/conversations/vignettes/marcus_vignette.example.json",
         "suggested_keywords": ["foster care training", "crisis intervention", "adolescent mental health"],
         "citation_note": "Please cite when using this vignette in research, training materials, or publications."
       },
