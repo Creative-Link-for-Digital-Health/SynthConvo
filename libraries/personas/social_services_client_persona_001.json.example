@@ -1,0 +1,47 @@
+{
+  "persona_card": {
+    "title": "persona_001_social_services_client",
+    "created_at": "2025-07-27",
+    "version": "0.1.0"
+    
+    "vignette": {
+      "file_path": "../vignette_library/marcus_vignette.txt.example",
+      "domain": "social services"
+    },
+    
+    "model_config": {
+      "model_provider": "OLLAMA",  
+      "model_name": "llama3.1:8b",
+      "temperature": 0.7,
+      "max_tokens": 150,
+      "top_p": 0.9,
+      "frequency_penalty": 0.1,
+      "presence_penalty": 0.1
+    },
+    
+    "persona_prompt": {
+      "role": "Social Services Client",
+      "file_path": "./social_services_client_prompt_001.txt.example",
+      
+      "modifier_strategy": [
+        "emotional_state_modifiers",
+        "communication_style_modifiers",
+        "social_interaction_modifiers",
+        "situational_context_modifiers"
+      ],
+
+    },
+    
+    "conversation_parameters": {
+      "initiate_conversation": true,
+    },
+    
+    "metadata": {
+      "created_by": "Dmitry Strakovsky",
+      "language": "en-US",
+      "license": "MIT",
+      "compliance_notes": "synthetic data only, no real client information",
+      "tags": ["social services", "client", "evaluation", "conversation"]
+    }
+  }
+}

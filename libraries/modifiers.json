@@ -1,0 +1,159 @@
+{
+  "modifying_adjectives": {
+    
+    "emotional_state_modifiers": {
+      "anxiety_spectrum": [
+        "worried", "concerned", "anxious", "nervous", "panicked", 
+        "uneasy", "apprehensive", "fearful", "distressed", "overwhelmed"
+      ],
+      "confidence_spectrum": [
+        "confident", "uncertain", "hesitant", "doubtful", "confused",
+        "assured", "skeptical", "questioning", "trusting", "suspicious"
+      ],
+      "hope_spectrum": [
+        "hopeful", "optimistic", "pessimistic", "discouraged", "determined",
+        "resigned", "motivated", "defeated", "resilient", "despairing"
+      ],
+      "urgency_spectrum": [
+        "urgent", "casual", "pressing", "relaxed", "immediate", 
+        "patient", "rushed", "deliberate", "critical", "routine"
+      ]
+    },
+
+    "communication_style_modifiers": {
+      "directness": [
+        "direct", "indirect", "blunt", "diplomatic", "straightforward",
+        "evasive", "candid", "circumspect", "frank", "tactful"
+      ],
+      "formality": [
+        "formal", "informal", "casual", "professional", "colloquial",
+        "respectful", "familiar", "ceremonious", "relaxed", "proper"
+      ],
+      "verbosity": [
+        "talkative", "concise", "verbose", "brief", "elaborate",
+        "succinct", "rambling", "detailed", "minimal", "expansive"
+      ],
+      "assertiveness": [
+        "assertive", "passive", "aggressive", "meek", "bold",
+        "timid", "demanding", "submissive", "forceful", "gentle"
+      ]
+    },
+
+    "cognitive_approach_modifiers": {
+      "information_processing": [
+        "analytical", "intuitive", "logical", "emotional", "systematic",
+        "spontaneous", "methodical", "impulsive", "rational", "reactive"
+      ],
+      "detail_orientation": [
+        "detail-oriented", "big-picture", "precise", "general", "specific",
+        "broad", "focused", "scattered", "thorough", "superficial"
+      ],
+      "decision_making": [
+        "decisive", "indecisive", "cautious", "impulsive", "deliberate",
+        "hasty", "careful", "reckless", "thoughtful", "spontaneous"
+      ]
+    },
+
+    "temporal_modifiers": {
+      "urgency_timing": [
+        "immediate", "gradual", "sudden", "progressive", "acute",
+        "chronic", "intermittent", "persistent", "sporadic", "constant"
+      ],
+      "experience_duration": [
+        "new", "experienced", "first-time", "veteran", "novice",
+        "seasoned", "unfamiliar", "accustomed", "fresh", "practiced"
+      ],
+      "change_pace": [
+        "rapid", "slow", "accelerating", "stable", "fluctuating",
+        "steady", "variable", "consistent", "erratic", "predictable"
+      ]
+    },
+
+    "social_interaction_modifiers": {
+      "interpersonal_style": [
+        "collaborative", "independent", "cooperative", "competitive", "supportive",
+        "confrontational", "accommodating", "challenging", "agreeable", "difficult"
+      ],
+      "trust_level": [
+        "trusting", "suspicious", "open", "guarded", "transparent",
+        "secretive", "forthcoming", "reserved", "candid", "defensive"
+      ],
+      "social_comfort": [
+        "comfortable", "awkward", "at-ease", "tense", "relaxed",
+        "nervous", "confident", "shy", "outgoing", "introverted"
+      ]
+    },
+
+    "knowledge_modifiers": {
+      "expertise_level": [
+        "knowledgeable", "uninformed", "expert", "novice", "educated",
+        "naive", "sophisticated", "simple", "informed", "ignorant"
+      ],
+      "curiosity": [
+        "curious", "disinterested", "inquisitive", "apathetic", "engaged",
+        "bored", "fascinated", "indifferent", "eager", "reluctant"
+      ],
+      "learning_style": [
+        "visual", "auditory", "hands-on", "theoretical", "practical",
+        "conceptual", "experiential", "academic", "intuitive", "systematic"
+      ]
+    },
+
+    "physical_state_modifiers": {
+      "energy_level": [
+        "energetic", "tired", "vigorous", "fatigued", "alert",
+        "drowsy", "active", "lethargic", "dynamic", "sluggish"
+      ],
+      "comfort_level": [
+        "comfortable", "uncomfortable", "relaxed", "tense", "at-ease",
+        "strained", "peaceful", "agitated", "calm", "restless"
+      ],
+      "health_perception": [
+        "healthy", "unwell", "robust", "fragile", "strong",
+        "weak", "resilient", "vulnerable", "fit", "sick"
+      ]
+    },
+
+    "cultural_background_modifiers": {
+      "communication_patterns": [
+        "direct", "contextual", "hierarchical", "egalitarian", "individual",
+        "collective", "expressive", "reserved", "formal", "informal"
+      ],
+      "relationship_approach": [
+        "task-focused", "relationship-focused", "independent", "interdependent", "personal",
+        "professional", "warm", "distant", "familiar", "respectful"
+      ]
+    },
+
+    "situational_context_modifiers": {
+      "environmental_comfort": [
+        "familiar", "unfamiliar", "comfortable", "intimidating", "welcoming",
+        "sterile", "homey", "clinical", "warm", "cold"
+      ],
+      "time_pressure": [
+        "rushed", "leisurely", "pressured", "relaxed", "hurried",
+        "unhurried", "tight", "flexible", "constrained", "open"
+      ],
+      "privacy_level": [
+        "private", "public", "confidential", "open", "personal",
+        "professional", "intimate", "formal", "secure", "exposed"
+      ]
+    },
+
+    "response_pattern_modifiers": {
+      "questioning_style": [
+        "probing", "surface-level", "follow-up", "initial", "clarifying",
+        "challenging", "supportive", "skeptical", "accepting", "critical"
+      ],
+      "information_sharing": [
+        "forthcoming", "withholding", "selective", "comprehensive", "minimal",
+        "detailed", "vague", "specific", "general", "precise"
+      ],
+      "feedback_receptivity": [
+        "receptive", "resistant", "open", "closed", "flexible",
+        "rigid", "adaptive", "stubborn", "willing", "defensive"
+      ]
+    }
+  }
+}
+
