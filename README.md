@@ -4,9 +4,24 @@ Use for generating synthetic conversations for system testing, development, fine
 
 ![alt text](assets/synth_convo_diagram.png)
 
+## Description
+The process begins with a Vignette (Conversation Context) - a predefined scenario or setting that establishes the conversational framework and context for the synthetic dialogue. Store your vignette in the `vignette_library` directory.
+
+*Persona Generation:* The vignette feeds into two distinct Persona Cards (A and B), which define specific LLM and Prompt. These cards define the characteristics, roles, and behavioral patterns of the two conversation participants. The choice of different models allows us additional flexibility. For example, using abliterated or specially fine-tuned local models to get closer to the persona parameters that we want.
+
+Both persona cards feed into the gen_conversations script, which orchestrates the actual dialogue generation between the two synthetic personas based on their defined characteristics and the original vignette context.
+
+The script produces a Conversation File (CSV) containing the generated dialogue exchanges.
+
+*Dataset Compilation Step:* The conversation files can be processed through the `gen_train_dataset` script, which consolidates multiple conversation files into a structured format.
+The pipeline culminates in a training dataset - a comprehensive collection of synthetic conversations formatted for machine learning model training, fine-tuning, or evaluation purposes.
+
+
 ## TODO 
-+ add example vignettes to the library
-+ create structured conversation settings file
+
++ create structured persona cards
++ add testing for topic collapse 
++ add human eval interface for realism
 + add token length param and test it with longer synthetic conversations
 
 ## Single Conversation from a Vignette 
