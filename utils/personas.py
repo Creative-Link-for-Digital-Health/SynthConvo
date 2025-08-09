@@ -1,4 +1,4 @@
-from llm_calls import extract_main_character
+from utils.llm_calls import extract_main_character
 
 
 def generate_prompts (vignette):

@@ -1,0 +1,7 @@
+*
+!.gitignore
+!*.example.json
+!*.example.txt
+!content_files
+!content_files/*.example.txt
+

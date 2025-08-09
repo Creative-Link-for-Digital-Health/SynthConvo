@@ -19,10 +19,14 @@ The pipeline culminates in a training dataset - a comprehensive collection of sy
 
 ## TODO 
 
-+ create structured persona cards
-+ add testing for topic collapse 
++ add conversation file to the diagram
++ clean vignette directory
++ clean utils
 + add human eval interface for realism
 + add token length param and test it with longer synthetic conversations
++ Explore implementation of repetition penalties (https://www.reddit.com/r/LocalLLaMA/comments/1g383mq/repetition_penalties_are_terribly_implemented_a/)
++ add testing for topic collapse 
++ refactor gen_train_dataset script to output to multiple training formats
 
 ## Single Conversation from a Vignette 
 To process a single conversation, point the script at the specific vignette in the vignette library. 

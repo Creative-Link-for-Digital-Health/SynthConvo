@@ -1,0 +1,45 @@
+{
+  "conversation_card": {
+    "title": "Social Services Initial Assessment - Marcus Case",
+    "created_at": "2025-08-09",
+    "version": "0.1.0",
+    
+    "participants": {
+      "participant_a": {
+        "persona_file": "../personas/social_services_client_001.json",
+        "apply_modifiers": true,
+        "applied_modifiers": [
+          "emotional_state_modifiers",
+          "communication_style_modifiers", 
+          "social_interaction_modifiers"
+        ]
+      },
+      "participant_b": {
+        "persona_file": "../personas/social_services_worker_001.json", 
+        "character_name": "Sarah Chen",
+        "apply_modifiers": false,
+        "applied_modifiers": null
+      }
+    },
+
+    "scenario": {
+      "vignette_file": "./vignettes/marcus_vignette.example.txt",
+      "domain": "social services"
+    },
+
+    "conversation_parameters": {
+      "initiator": "participant_b"
+    },
+
+    "modifier_config": {
+      "modifiers_file": "../modifiers.json"
+    },
+
+    "metadata": {
+      "created_by": "Dmitry Strakovsky",
+      "description": "Conversation simulating an initial assessment for a social services client", 
+      "language": "en-US",
+      "tags": ["intake", "social services", "assessment"]
+    }
+  }
+}
