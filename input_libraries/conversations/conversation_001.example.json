@@ -6,7 +6,7 @@
     
     "participants": {
       "participant_a": {
-        "persona_file": "../personas/social_services_client_001.example.json",
+        "persona_file": "../personas/social_services_client_persona_001.example.json",
         "apply_modifiers": true,
         "applied_modifiers": [
           "emotional_state_modifiers",
@@ -15,7 +15,7 @@
         ]
       },
       "participant_b": {
-        "persona_file": "../personas/social_services_worker_001.example.json", 
+        "persona_file": "../personas/social_services_worker_persona_001.example.json", 
         "character_name": "Sarah Chen",
         "apply_modifiers": false,
         "applied_modifiers": null
