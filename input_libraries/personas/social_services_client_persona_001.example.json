@@ -16,7 +16,7 @@
     
     "persona_prompt": {
       "role": "Social Services Client",
-      "prompt_file": "./prompts/social_services_client_001.example.txt"
+      "prompt_file": "./prompts/social_services_client_prompt_001.example.txt"
     },
     
     "metadata": {

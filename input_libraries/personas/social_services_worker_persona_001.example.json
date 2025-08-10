@@ -16,7 +16,7 @@
     
     "persona_prompt": {
       "role": "Social Services Worker",
-      "prompt_file": "./prompts/social_services_worker_001.example.txt"
+      "prompt_file": "./prompts/social_services_worker_prompt_001.example.txt"
     },
     
     "metadata": {
