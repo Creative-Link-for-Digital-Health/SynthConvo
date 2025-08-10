@@ -1,4 +1,4 @@
-name: synth_actors
+name: synth-convo
 channels:
   - defaults
   - anaconda
@@ -9,6 +9,19 @@ dependencies:
   - pip
   - pip:
     - OpenAI
-    - pydantic
     - toml
-    - instructor
+
+# To create environment:
+# conda env create -f environment.yml
+
+# To activate:
+# conda activate synth-convo
+
+# To update the environment with changes from environment.yml:
+# conda env update --file environment.yml --name synth-convo
+
+# To stop:
+# conda deactivate
+
+# Delete the environment 
+# conda remove --name synth-convo --all
