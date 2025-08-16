@@ -16,12 +16,19 @@ The script produces a Conversation File (CSV) containing the generated dialogue 
 *Dataset Compilation Step:* The conversation files can be processed through the `gen_train_dataset` script, which consolidates multiple conversation files into a structured format.
 The pipeline culminates in a training dataset - a comprehensive collection of synthetic conversations formatted for machine learning model training, fine-tuning, or evaluation purposes.
 
+## Generation Process
+
+Validate that all of the conversation components are present and not mistakes in the setup where made
+`python utils/interface_validator.py input_libraries/conversations/conversation_001.example.json`
+
+Generate a conversation
+`python gen_conversations.py --config input_libraries/conversations/conversation_001.example.json --turns 3 --count 2 --output-dir outputs/test_run --debug-prompts`
 
 ## TODO 
 
++ update modifiers prompt
 + add conversation file to the diagram
 + clean vignette directory
-+ clean utils
 + add explanation for opt-in nature of gitignore files
 + add human eval interface for realism
 + add token length param and test it with longer synthetic conversations
