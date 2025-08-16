@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Conversation Generator v9 - Role Flexible & Clean
+Generate synthetic conversations
 
 Generates synthetic conversations with complete role flexibility.
 Works for any training scenario: client simulation, worker training, etc.
@@ -15,6 +15,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import pandas as pd
+import copy
 
 from utils.llm_provider import LLMProvider
 from utils.modifier_engine import ModifierEngine
@@ -134,12 +135,21 @@ class ConversationGenerator:
             raise ValueError(f"Error loading vignette from {vignette_path}: {e}")
     
     def _apply_modifiers(self) -> Dict[str, List[str]]:
-        """Apply random modifiers to participants who need them."""
+        """Apply intelligent modifiers to participants who need them."""
         if 'modifier_config' not in self.config:
             return {}
         
         modifier_file = self.config['modifier_config']['modifiers_file']
         modifier_path = self._resolve_path(modifier_file)
+        
+        # Get context type for intelligent modifier selection
+        context_type = self.config.get('scenario', {}).get('domain', 'general')
+        
+        # Get coherence level from config (default: balanced)
+        coherence_level = self.config['modifier_config'].get('personality_coherence', 'balanced')
+        
+        # Get target modifier count from config (default: 3)
+        target_count = self.config['modifier_config'].get('target_modifier_count', 3)
         
         applied_modifiers = {}
         
@@ -147,9 +157,24 @@ class ConversationGenerator:
             if participant_config.get('apply_modifiers', False):
                 modifier_categories = participant_config.get('applied_modifiers', [])
                 
-                participant_modifiers = self.modifier_engine.generate_random_modifiers(
-                    str(modifier_path), modifier_categories
+                # Use the new smart modifier generation
+                participant_modifiers = self.modifier_engine.generate_smart_modifiers(
+                    modifier_file_path=str(modifier_path),
+                    requested_categories=modifier_categories,
+                    context_type=context_type,
+                    personality_coherence=coherence_level,
+                    target_count=target_count
                 )
+                
+                # Validate the generated combination and log results
+                validation = self.modifier_engine.validate_modifier_combination(participant_modifiers)
+                if not validation.get('is_valid', True):
+                    print(f"⚠️  Modifier validation warning for {participant_id}:")
+                    for suggestion in validation.get('suggestions', []):
+                        print(f"   - {suggestion}")
+                    if validation.get('conflicting_pairs'):
+                        print(f"   - Conflicting pairs: {validation['conflicting_pairs']}")
+                
                 applied_modifiers[participant_id] = participant_modifiers
             else:
                 applied_modifiers[participant_id] = []
@@ -167,7 +192,11 @@ class ConversationGenerator:
         # Add conversation-specific modifiers if any
         modifiers = conversation_modifiers.get(participant_id, [])
         if modifiers:
-            modifier_text = f"\n\nAdditional behavioral modifiers for this conversation: {', '.join(modifiers)}"
+            modifier_text = (
+                f"\n\nThere are a number of feelings and behavioral tendencies that you currently have about this situation. "
+                f"Given your personality and what's happening, here are the specific traits you should try very hard to embody "
+                f"throughout this conversation: {', '.join(modifiers)}"
+            )
             full_prompt += modifier_text
         
         return full_prompt
@@ -176,7 +205,42 @@ class ConversationGenerator:
         """Get model configuration for a participant."""
         return self.participants[participant_id]['persona']['model_config']
     
-    def generate_conversations(self, num_turns: int, num_conversations: int) -> List[List[Dict[str, Any]]]:
+    def _get_speaker_name(self, participant_id: str) -> str:
+        """Get the display name for a participant."""
+        return self.config['participants'][participant_id].get('description', participant_id)
+    
+    def _build_message_history(self, full_conversation_history: List[Dict[str, str]], 
+                              current_participant: str, system_prompt: str) -> List[Dict[str, str]]:
+        """Build message history for a participant from their perspective."""
+        participant_config = self.config['participants'][current_participant]
+        llm_role = participant_config.get('llm_role', 'assistant')
+        
+        # Start with system prompt
+        messages = [{"role": "system", "content": system_prompt}]
+        
+        # Add the conversation history from the current participant's perspective with speaker names
+        for historical_msg in full_conversation_history:
+            hist_participant = historical_msg['participant']
+            hist_content = historical_msg['content']
+            
+            # Get the speaker name for this message
+            speaker_name = self._get_speaker_name(hist_participant)
+            
+            # Prefix content with speaker name
+            prefixed_content = f"{speaker_name}: {hist_content}"
+            
+            if hist_participant == current_participant:
+                # This participant's own messages
+                messages.append({"role": llm_role, "content": prefixed_content})
+            else:
+                # Other participant's messages (opposite role)
+                other_role = "user" if llm_role == "assistant" else "assistant"
+                messages.append({"role": other_role, "content": prefixed_content})
+        
+        return messages
+    
+    def generate_conversations(self, num_turns: int, num_conversations: int, 
+                             capture_debug: bool = False) -> List[Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]]:
         """Generate multiple conversations with role flexibility."""
         conversations = []
         
@@ -184,12 +248,12 @@ class ConversationGenerator:
             print(f"Generating conversation {i + 1}/{num_conversations}...")
             
             # Generate single conversation
-            conversation = self._generate_single_conversation(num_turns)
-            conversations.append(conversation)
+            conversation, debug_data = self._generate_single_conversation(num_turns, capture_debug)
+            conversations.append((conversation, debug_data))
         
         return conversations
     
-    def _generate_single_conversation(self, num_turns: int) -> List[Dict[str, Any]]:
+    def _generate_single_conversation(self, num_turns: int, capture_debug: bool = False) -> Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]:
         """Generate a single conversation with pre-applied modifiers and flexible roles."""
         conversation = []
         initiator = self.config['conversation_parameters']['initiator']
@@ -209,12 +273,31 @@ class ConversationGenerator:
         for participant_id in participant_ids:
             system_prompts[participant_id] = self._build_system_prompt_with_modifiers(participant_id, conversation_modifiers)
         
+        # Initialize debug data if requested
+        debug_data = None
+        if capture_debug:
+            debug_data = {
+                'conversation_modifiers': copy.deepcopy(conversation_modifiers),
+                'system_prompts': copy.deepcopy(system_prompts),
+                'turn_snapshots': [],  # Capture exact state at each turn
+                'message_history_snapshots': [],  # Capture message history progression
+                'generation_metadata': {
+                    'initiator': initiator,
+                    'turn_order': turn_order,
+                    'participant_configs': {pid: self.config['participants'][pid] for pid in participant_ids}
+                }
+            }
+        
         # Track the full conversation flow for proper context
         full_conversation_history = []
         
         # Generate conversation turns (each turn is a complete Q&A exchange)
         for turn in range(num_turns):
             turn_responses = []
+            turn_debug_info = {
+                'turn_number': turn,
+                'exchanges': []
+            } if capture_debug else None
             
             # Generate both parts of the exchange for this turn
             for exchange_part in range(2):  # Question, then Answer
@@ -225,28 +308,12 @@ class ConversationGenerator:
                 participant_config = self.config['participants'][current_participant]
                 llm_role = participant_config.get('llm_role', 'assistant')
                 
-                # Build messages for current participant (system prompt + history)
-                messages = [{"role": "system", "content": system_prompts[current_participant]}]
-                
-                # Add the conversation history from the current participant's perspective with speaker names
-                for i, historical_msg in enumerate(full_conversation_history):
-                    hist_participant = historical_msg['participant']
-                    hist_content = historical_msg['content']
-                    
-                    # Get the speaker name for this message
-                    hist_participant_config = self.config['participants'][hist_participant]
-                    speaker_name = hist_participant_config.get('description', hist_participant)
-                    
-                    # Prefix content with speaker name
-                    prefixed_content = f"{speaker_name}: {hist_content}"
-                    
-                    if hist_participant == current_participant:
-                        # This participant's own messages
-                        messages.append({"role": llm_role, "content": prefixed_content})
-                    else:
-                        # Other participant's messages (opposite role)
-                        other_role = "user" if llm_role == "assistant" else "assistant"
-                        messages.append({"role": other_role, "content": prefixed_content})
+                # Build messages for current participant using shared logic
+                messages = self._build_message_history(
+                    full_conversation_history, 
+                    current_participant, 
+                    system_prompts[current_participant]
+                )
                 
                 # Add conversation starter for the very first exchange
                 if turn == 0 and exchange_part == 0:
@@ -260,6 +327,17 @@ class ConversationGenerator:
                         "role": "user",
                         "content": "Continue the conversation by asking an appropriate follow-up question based on what was just said."
                     })
+                
+                # Capture debug info for this exchange BEFORE API call
+                if capture_debug:
+                    exchange_debug = {
+                        'exchange_part': exchange_part,
+                        'current_participant': current_participant,
+                        'llm_role': llm_role,
+                        'messages_sent_to_llm': copy.deepcopy(messages),  # Exact messages sent
+                        'conversation_history_length': len(full_conversation_history),
+                        'system_prompt_used': system_prompts[current_participant]
+                    }
                 
                 # Get model config
                 model_config = self._get_model_config(current_participant)
@@ -280,6 +358,15 @@ class ConversationGenerator:
                     response = f"[Error generating response: {e}]"
                     print(f"Error generating response for {current_participant}: {e}")
                 
+                # Complete debug info for this exchange
+                if capture_debug:
+                    exchange_debug.update({
+                        'response_received': response.strip(),
+                        'model_config_used': copy.deepcopy(model_config),
+                        'generation_timestamp': datetime.now().isoformat()
+                    })
+                    turn_debug_info['exchanges'].append(exchange_debug)
+                
                 # Record the response as part of this turn
                 turn_data = {
                     'turn': turn,
@@ -295,18 +382,33 @@ class ConversationGenerator:
                     'participant': current_participant,
                     'content': response.strip()
                 })
+                
+                # Capture message history snapshot after this exchange
+                if capture_debug:
+                    debug_data['message_history_snapshots'].append({
+                        'after_turn': turn,
+                        'after_exchange': exchange_part,
+                        'participant': current_participant,
+                        'full_history_state': copy.deepcopy(full_conversation_history),
+                        'message_count': len(full_conversation_history)
+                    })
+            
+            # Add turn debug info
+            if capture_debug and turn_debug_info:
+                debug_data['turn_snapshots'].append(turn_debug_info)
             
             # Add both parts of this turn to the conversation
             conversation.extend(turn_responses)
         
-        return conversation
+        return conversation, debug_data
     
-    def save_conversations_json(self, conversations: List[List[Dict[str, Any]]], output_dir: str, debug_prompts: bool = False):
+    def save_conversations_json(self, conversations: List[Tuple[List[Dict[str, Any]], Optional[Dict[str, Any]]]], 
+                               output_dir: str, save_debug: bool = False):
         """Save conversations to JSON files using the improved schema."""
         os.makedirs(output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        for i, conversation in enumerate(conversations):
+        for i, (conversation, debug_data) in enumerate(conversations):
             filename = f"conversation_{timestamp}_{i+1:03d}.json"
             filepath = os.path.join(output_dir, filename)
             
@@ -318,9 +420,9 @@ class ConversationGenerator:
             
             print(f"Saved conversation to {filepath}")
             
-            # Save debug prompt information if requested
-            if debug_prompts:
-                self._save_debug_prompts(conversation, i+1, output_dir, timestamp)
+            # Save debug information if requested and available
+            if save_debug and debug_data:
+                self._save_debug_data(debug_data, conversation, i+1, output_dir, timestamp)
     
     def _convert_to_json_schema(self, conversation: List[Dict[str, Any]], conversation_num: int) -> Dict[str, Any]:
         """Convert internal conversation format to the structured JSON schema."""
@@ -413,123 +515,218 @@ class ConversationGenerator:
         
         return conversation_json
     
-    def _save_debug_prompts(self, conversation: List[Dict[str, Any]], conversation_num: int, output_dir: str, timestamp: str):
-        """Save detailed prompt debugging information."""
-        # Recreate the conversation modifiers from the first turn
-        conversation_modifiers = {}
-        for turn_data in conversation:
-            participant = turn_data['participant']
-            if participant not in conversation_modifiers:
-                conversation_modifiers[participant] = turn_data['modifiers']
+    def _save_debug_data(self, debug_data: Dict[str, Any], conversation: List[Dict[str, Any]], 
+                        conversation_num: int, output_dir: str, timestamp: str):
+        """Save comprehensive debug information captured during generation."""
         
-        # Save detailed prompt information for each participant
-        for participant_id in self.participants.keys():
-            debug_filename = f"conversation_{timestamp}_{conversation_num:03d}_{participant_id}_debug.txt"
+        # Save raw debug data as JSON
+        debug_json_filename = f"conversation_{timestamp}_{conversation_num:03d}_debug_data.json"
+        debug_json_filepath = os.path.join(output_dir, debug_json_filename)
+        
+        with open(debug_json_filepath, 'w', encoding='utf-8') as f:
+            json.dump(debug_data, f, indent=2, ensure_ascii=False)
+        print(f"Saved raw debug data to {debug_json_filepath}")
+        
+        # Save modifier validation report
+        self._save_modifier_validation_report(debug_data, conversation_num, output_dir, timestamp)
+        
+        # Save human-readable debug analysis for each participant
+        for participant_id in debug_data['generation_metadata']['participant_configs'].keys():
+            debug_filename = f"conversation_{timestamp}_{conversation_num:03d}_{participant_id}_debug_analysis.txt"
             debug_filepath = os.path.join(output_dir, debug_filename)
             
             with open(debug_filepath, 'w', encoding='utf-8') as f:
-                f.write(f"=== DEBUG PROMPT INFORMATION FOR {participant_id.upper()} ===\n\n")
-                
-                # 1. Show the complete system prompt with modifiers
-                system_prompt = self._build_system_prompt_with_modifiers(participant_id, conversation_modifiers)
-                f.write(f"1. COMPLETE SYSTEM PROMPT (with modifiers):\n")
-                f.write("=" * 60 + "\n")
-                f.write(system_prompt)
-                f.write("\n" + "=" * 60 + "\n\n")
-                
-                # 2. Show participant configuration
-                participant_config = self.config['participants'][participant_id]
-                f.write(f"2. PARTICIPANT CONFIGURATION:\n")
-                f.write("=" * 40 + "\n")
-                f.write(f"Description: {participant_config.get('description', 'N/A')}\n")
-                f.write(f"LLM Role: {participant_config.get('llm_role', 'N/A')}\n")
-                f.write(f"Apply Modifiers: {participant_config.get('apply_modifiers', False)}\n")
-                f.write(f"Applied Modifiers: {conversation_modifiers.get(participant_id, [])}\n")
-                f.write("\n")
-                
-                # 3. Show how conversation history builds up for this participant
-                f.write(f"3. CONVERSATION HISTORY FROM {participant_id.upper()}'S PERSPECTIVE:\n")
+                self._write_debug_analysis(f, debug_data, participant_id, conversation)
+            
+            print(f"Saved debug analysis for {participant_id} to {debug_filepath}")
+    
+    def _save_modifier_validation_report(self, debug_data: Dict[str, Any], conversation_num: int, 
+                                       output_dir: str, timestamp: str):
+        """Save detailed modifier validation and selection report."""
+        validation_filename = f"conversation_{timestamp}_{conversation_num:03d}_modifier_report.txt"
+        validation_filepath = os.path.join(output_dir, validation_filename)
+        
+        with open(validation_filepath, 'w', encoding='utf-8') as f:
+            f.write("=== MODIFIER SELECTION AND VALIDATION REPORT ===\n\n")
+            
+            conversation_modifiers = debug_data.get('conversation_modifiers', {})
+            
+            for participant_id, modifiers in conversation_modifiers.items():
+                f.write(f"PARTICIPANT: {participant_id.upper()}\n")
                 f.write("=" * 50 + "\n")
                 
-                # Simulate the conversation history building
-                full_conversation_history = []
-                llm_role = participant_config.get('llm_role', 'assistant')
+                if not modifiers:
+                    f.write("No modifiers applied to this participant.\n\n")
+                    continue
                 
-                f.write(f"This participant has LLM role: {llm_role}\n")
-                f.write(f"So they see:\n")
-                f.write(f"- Their own messages as: {llm_role}\n")
-                f.write(f"- Other participant's messages as: {'user' if llm_role == 'assistant' else 'assistant'}\n\n")
+                f.write(f"Applied Modifiers: {modifiers}\n\n")
                 
-                turn_count = 0
-                for turn_data in conversation:
-                    turn_count += 1
-                    hist_participant = turn_data['participant']
-                    hist_content = turn_data['content']
-                    
-                    # Add to simulated history
-                    full_conversation_history.append({
-                        'participant': hist_participant,
-                        'content': hist_content
-                    })
-                    
-                    f.write(f"--- After Turn {turn_count} ---\n")
-                    f.write(f"Latest message from: {hist_participant}\n")
-                    f.write(f"Content: {hist_content[:100]}{'...' if len(hist_content) > 100 else ''}\n")
-                    
-                    # Show what this participant would see at this point
-                    f.write(f"\nComplete message history that {participant_id} would see:\n")
-                    
-                    # Build the message history from this participant's perspective
-                    messages = [{"role": "system", "content": "[SYSTEM PROMPT SHOWN ABOVE]"}]
-                    
-                    for i, historical_msg in enumerate(full_conversation_history):
-                        hist_p = historical_msg['participant']
-                        hist_c = historical_msg['content']
-                        
-                        if hist_p == participant_id:
-                            # This participant's own messages
-                            role = llm_role
-                            speaker_name = participant_config.get('description', participant_id)
-                        else:
-                            # Other participant's messages (opposite role)
-                            role = "user" if llm_role == "assistant" else "assistant"
-                            other_participant_config = self.config['participants'][hist_p]
-                            speaker_name = other_participant_config.get('description', hist_p)
-                        
-                        # Show with speaker prefix
-                        prefixed_content = f"{speaker_name}: {hist_c}"
-                        f.write(f"  Message {i+1}: role='{role}', content='{prefixed_content[:80]}{'...' if len(prefixed_content) > 80 else ''}'\n")
-                        messages.append({"role": role, "content": prefixed_content})
-                    
-                    f.write(f"\nMessage sequence: {[m['role'] for m in messages[1:]]}\n")  # Skip system message
-                    f.write("\n" + "-" * 40 + "\n\n")
+                # Validate this combination
+                validation = self.modifier_engine.validate_modifier_combination(modifiers)
                 
-                # 4. Show the exact API call for the last exchange
-                f.write(f"4. FINAL API CALL EXAMPLE (last exchange):\n")
-                f.write("=" * 40 + "\n")
-                f.write("messages = [\n")
-                f.write("  {\n")
-                f.write("    \"role\": \"system\",\n")
-                # Fix the f-string backslash issue
-                system_preview = system_prompt[:100].replace('\n', '\\n')
-                f.write(f"    \"content\": \"{system_preview}...\"\n")
-                f.write("  },\n")
+                f.write("VALIDATION RESULTS:\n")
+                f.write("-" * 30 + "\n")
+                f.write(f"Overall Valid: {validation.get('is_valid', 'Unknown')}\n")
+                f.write(f"Has Contradictions: {validation.get('has_contradictions', 'Unknown')}\n")
+                f.write(f"Intensity Coherent: {validation.get('intensity_coherent', 'Unknown')}\n")
+                f.write(f"Category Diversity: {validation.get('category_diversity', 'Unknown')}\n")
+                f.write(f"Intensity Levels: {validation.get('intensity_levels', [])}\n")
+                f.write(f"Represented Categories: {validation.get('represented_categories', [])}\n")
                 
-                # Show last few messages
-                if len(messages) > 1:
-                    for msg in messages[-3:]:  # Show last 3 messages
-                        f.write("  {\n")
-                        f.write(f"    \"role\": \"{msg['role']}\",\n")
-                        # Fix the f-string backslash issue
-                        content_preview = msg['content'][:100].replace('\n', '\\n').replace('"', '\\"')
-                        content_preview = content_preview + ('...' if len(msg['content']) > 100 else '')
-                        f.write(f"    \"content\": \"{content_preview}\"\n")
-                        f.write("  },\n")
+                if validation.get('conflicting_pairs'):
+                    f.write(f"\nCONFLICTING PAIRS:\n")
+                    for pair in validation['conflicting_pairs']:
+                        f.write(f"  - {pair[0]} ↔ {pair[1]}\n")
                 
-                f.write("]\n\n")
-                f.write("=" * 60 + "\n")
+                if validation.get('suggestions'):
+                    f.write(f"\nSUGGESTIONS FOR IMPROVEMENT:\n")
+                    for suggestion in validation['suggestions']:
+                        f.write(f"  - {suggestion}\n")
+                
+                f.write("\n" + "=" * 70 + "\n\n")
+        
+        print(f"Saved modifier validation report to {validation_filepath}")
+    
+    def _write_debug_analysis(self, f, debug_data: Dict[str, Any], participant_id: str, conversation: List[Dict[str, Any]]):
+        """Write comprehensive debug analysis for a specific participant."""
+        f.write(f"=== COMPREHENSIVE DEBUG ANALYSIS FOR {participant_id.upper()} ===\n\n")
+        
+        # 1. Generation Overview
+        f.write("1. GENERATION OVERVIEW\n")
+        f.write("=" * 50 + "\n")
+        metadata = debug_data['generation_metadata']
+        participant_config = metadata['participant_configs'][participant_id]
+        f.write(f"Initiator: {metadata['initiator']}\n")
+        f.write(f"Turn order: {metadata['turn_order']}\n")
+        f.write(f"Participant role: {participant_config.get('llm_role', 'assistant')}\n")
+        f.write(f"Applied modifiers: {debug_data['conversation_modifiers'].get(participant_id, [])}\n")
+        f.write(f"Total turns generated: {len(debug_data['turn_snapshots'])}\n\n")
+        
+        # 2. Modifier Analysis
+        modifiers = debug_data['conversation_modifiers'].get(participant_id, [])
+        if modifiers:
+            f.write("2. MODIFIER ANALYSIS\n")
+            f.write("=" * 50 + "\n")
             
-            print(f"Saved debug info for {participant_id} to {debug_filepath}")
+            # Validate modifiers
+            validation = self.modifier_engine.validate_modifier_combination(modifiers)
+            
+            f.write(f"Selected Modifiers: {modifiers}\n")
+            f.write(f"Modifier Count: {len(modifiers)}\n")
+            f.write(f"Valid Combination: {validation.get('is_valid', 'Unknown')}\n")
+            f.write(f"Intensity Levels: {validation.get('intensity_levels', [])}\n")
+            f.write(f"Category Diversity: {validation.get('category_diversity', 0)}\n")
+            f.write(f"Represented Categories: {validation.get('represented_categories', [])}\n")
+            
+            if validation.get('conflicting_pairs'):
+                f.write(f"⚠️  Conflicting Pairs: {validation['conflicting_pairs']}\n")
+            
+            if validation.get('suggestions'):
+                f.write(f"Improvement Suggestions:\n")
+                for suggestion in validation['suggestions']:
+                    f.write(f"  - {suggestion}\n")
+            
+            f.write(f"\nModifier Integration in Prompt:\n")
+            f.write(f"\"There are a number of feelings and behavioral tendencies that you currently have about this situation. ")
+            f.write(f"Given your personality and what's happening, here are the specific traits you should try very hard to embody ")
+            f.write(f"throughout this conversation: {', '.join(modifiers)}\"\n\n")
+        else:
+            f.write("2. MODIFIER ANALYSIS\n")
+            f.write("=" * 50 + "\n")
+            f.write("No modifiers applied to this participant.\n\n")
+        
+        # 3. System Prompt Used
+        f.write("3. EXACT SYSTEM PROMPT USED\n")
+        f.write("=" * 50 + "\n")
+        system_prompt = debug_data['system_prompts'][participant_id]
+        f.write(system_prompt)
+        f.write("\n\n")
+        
+        # 4. Turn-by-turn Analysis
+        f.write("4. TURN-BY-TURN GENERATION ANALYSIS\n")
+        f.write("=" * 50 + "\n")
+        
+        for turn_snapshot in debug_data['turn_snapshots']:
+            turn_num = turn_snapshot['turn_number']
+            f.write(f"\n--- TURN {turn_num + 1} ---\n")
+            
+            for exchange in turn_snapshot['exchanges']:
+                if exchange['current_participant'] == participant_id:
+                    f.write(f"\nEXCHANGE: {participant_id} (Exchange Part {exchange['exchange_part']})\n")
+                    f.write(f"LLM Role: {exchange['llm_role']}\n")
+                    f.write(f"Conversation History Length: {exchange['conversation_history_length']}\n")
+                    f.write(f"Generation Time: {exchange['generation_timestamp']}\n")
+                    
+                    f.write(f"\nExact Messages Sent to LLM:\n")
+                    for i, msg in enumerate(exchange['messages_sent_to_llm']):
+                        role = msg['role']
+                        content = msg['content']
+                        if role == 'system':
+                            f.write(f"  [{i}] SYSTEM: [System prompt - see section 3]\n")
+                        else:
+                            content_preview = content[:100] + ('...' if len(content) > 100 else '')
+                            f.write(f"  [{i}] {role.upper()}: {content_preview}\n")
+                    
+                    f.write(f"\nResponse Generated:\n")
+                    response_preview = exchange['response_received'][:200] + ('...' if len(exchange['response_received']) > 200 else '')
+                    f.write(f"  {response_preview}\n")
+                    
+                    f.write(f"\nModel Config Used:\n")
+                    for key, value in exchange['model_config_used'].items():
+                        f.write(f"  {key}: {value}\n")
+        
+        # 5. Message History Progression
+        f.write(f"\n\n5. MESSAGE HISTORY PROGRESSION FOR {participant_id.upper()}\n")
+        f.write("=" * 60 + "\n")
+        f.write("This shows how the conversation history grew from this participant's perspective:\n\n")
+        
+        participant_config = metadata['participant_configs'][participant_id]
+        llm_role = participant_config.get('llm_role', 'assistant')
+        
+        for snapshot in debug_data['message_history_snapshots']:
+            if snapshot['participant'] == participant_id:
+                f.write(f"After Turn {snapshot['after_turn'] + 1}, Exchange {snapshot['after_exchange'] + 1}:\n")
+                f.write(f"History length: {snapshot['message_count']} messages\n")
+                
+                # Show how this participant would see the conversation at this point
+                f.write("Message sequence this participant sees:\n")
+                messages = self._build_message_history(
+                    snapshot['full_history_state'], 
+                    participant_id, 
+                    "[SYSTEM PROMPT]"
+                )
+                
+                for i, msg in enumerate(messages):
+                    if i == 0:  # System message
+                        f.write(f"  [{i}] system: [SYSTEM PROMPT]\n")
+                    else:
+                        role = msg['role']
+                        content = msg['content'][:80] + ('...' if len(msg['content']) > 80 else '')
+                        f.write(f"  [{i}] {role}: {content}\n")
+                
+                f.write(f"Role sequence: {[m['role'] for m in messages[1:]]}\n")  # Skip system
+                f.write("-" * 40 + "\n")
+        
+        # 6. Final State Summary
+        f.write(f"\n\n6. FINAL STATE SUMMARY\n")
+        f.write("=" * 40 + "\n")
+        final_snapshot = debug_data['message_history_snapshots'][-1] if debug_data['message_history_snapshots'] else None
+        if final_snapshot:
+            f.write(f"Final conversation length: {final_snapshot['message_count']} exchanges\n")
+            
+            # Count this participant's messages
+            participant_messages = [msg for msg in final_snapshot['full_history_state'] if msg['participant'] == participant_id]
+            f.write(f"Messages from {participant_id}: {len(participant_messages)}\n")
+            
+            # Show final message roles
+            final_messages = self._build_message_history(
+                final_snapshot['full_history_state'], 
+                participant_id, 
+                "[SYSTEM]"
+            )
+            f.write(f"Final role sequence: {[m['role'] for m in final_messages]}\n")
+        
+        f.write("\n" + "=" * 80 + "\n")
 
 
 def main():
@@ -539,13 +736,13 @@ def main():
         epilog="""
 Examples:
   # Check interfaces without generating
-  python gen_conversations_v9.py --config conversation.json --check-interfaces
+  python gen_conversations.py --config conversation.json --check-interfaces
   
   # Generate conversations for client simulation training
-  python gen_conversations_v9.py --config conversation.json --turns 5 --count 3 --output-dir outputs/client_training
+  python gen_conversations.py --config conversation.json --turns 5 --count 3 --output-dir outputs/client_training
   
-  # Generate with debug prompt information
-  python gen_conversations_v9.py --config conversation.json --turns 3 --count 1 --output-dir outputs/debug --debug-prompts
+  # Generate with debug information
+  python gen_conversations.py --config conversation.json --turns 3 --count 1 --output-dir outputs/debug --debug
         """
     )
     
@@ -576,9 +773,9 @@ Examples:
     )
     
     parser.add_argument(
-        "--debug-prompts", 
+        "--debug", 
         action="store_true",
-        help="Save detailed prompt information to separate files for debugging"
+        help="Capture and save comprehensive debug information during generation"
     )
     
     parser.add_argument(
@@ -626,17 +823,21 @@ Examples:
         # Initialize generator
         generator = ConversationGenerator(args.config)
         
-        # Generate conversations
-        conversations = generator.generate_conversations(args.turns, args.count)
+        # Generate conversations with debug capture if requested
+        conversations = generator.generate_conversations(args.turns, args.count, args.debug)
         
-        # Save as JSON with debug info if requested
-        generator.save_conversations_json(conversations, args.output_dir, args.debug_prompts)
+        # Save as JSON with debug info if captured
+        generator.save_conversations_json(conversations, args.output_dir, args.debug)
         
         print(f"\n🎉 Successfully generated {len(conversations)} conversations with {args.turns} turns each.")
         print(f"💾 Output saved to: {args.output_dir}")
         
-        if args.debug_prompts:
-            print(f"🔍 Debug prompt files saved with detailed conversation history analysis")
+        if args.debug:
+            print(f"🔍 Comprehensive debug information saved:")
+            print(f"   - Raw debug data (JSON format)")
+            print(f"   - Modifier validation reports")
+            print(f"   - Per-participant analysis (human-readable)")
+            print(f"   - Exact API call history and message progression")
         
     except Exception as e:
         print(f"❌ Error: {e}")

@@ -11,9 +11,9 @@
         "persona_file": "../personas/social_services_client_persona_001.example.json",
         "apply_modifiers": true,
         "applied_modifiers": [
-          "emotional_state_modifiers",
-          "communication_style_modifiers", 
-          "social_interaction_modifiers"
+          "emotional_intensity_spectrums",
+          "communication_intensity_spectrums", 
+          "social_engagement_spectrums"
         ]
       },
       "participant_b": {

@@ -1,159 +1,232 @@
 {
   "modifying_adjectives": {
     
-    "emotional_state_modifiers": {
-      "anxiety_spectrum": [
-        "worried", "concerned", "anxious", "nervous", "panicked", 
-        "uneasy", "apprehensive", "fearful", "distressed", "overwhelmed"
+    "emotional_intensity_spectrums": {
+      "anxiety_levels": [
+        "completely calm", "slightly concerned", "worried", "anxious", "very anxious", "panicked"
       ],
-      "confidence_spectrum": [
-        "confident", "uncertain", "hesitant", "doubtful", "confused",
-        "assured", "skeptical", "questioning", "trusting", "suspicious"
+      "confidence_levels": [
+        "very uncertain", "hesitant", "somewhat confident", "confident", "very confident", "completely assured"
       ],
-      "hope_spectrum": [
-        "hopeful", "optimistic", "pessimistic", "discouraged", "determined",
-        "resigned", "motivated", "defeated", "resilient", "despairing"
+      "optimism_levels": [
+        "slightly hopeful", "optimistic", "very optimistic", "enthusiastic", "euphoric"
       ],
-      "urgency_spectrum": [
-        "urgent", "casual", "pressing", "relaxed", "immediate", 
-        "patient", "rushed", "deliberate", "critical", "routine"
+      "pessimism_levels": [
+        "slightly discouraged", "pessimistic", "very pessimistic", "defeated", "despairing"
+      ],
+      "stress_levels": [
+        "completely relaxed", "slightly stressed", "moderately stressed", "very stressed", "overwhelmed"
+      ],
+      "frustration_levels": [
+        "mildly annoyed", "frustrated", "very frustrated", "angry", "furious"
+      ],
+      "excitement_levels": [
+        "mildly interested", "engaged", "excited", "very excited", "ecstatic"
       ]
     },
 
-    "communication_style_modifiers": {
-      "directness": [
-        "direct", "indirect", "blunt", "diplomatic", "straightforward",
-        "evasive", "candid", "circumspect", "frank", "tactful"
+    "communication_intensity_spectrums": {
+      "directness_levels": [
+        "very indirect", "diplomatic", "straightforward", "direct", "very direct", "brutally honest"
       ],
-      "formality": [
-        "formal", "informal", "casual", "professional", "colloquial",
-        "respectful", "familiar", "ceremonious", "relaxed", "proper"
+      "formality_levels": [
+        "very casual", "informal", "neutral", "formal", "very formal", "ceremonial"
       ],
-      "verbosity": [
-        "talkative", "concise", "verbose", "brief", "elaborate",
-        "succinct", "rambling", "detailed", "minimal", "expansive"
+      "verbosity_levels": [
+        "extremely brief", "concise", "moderate", "detailed", "very verbose", "rambling"
       ],
-      "assertiveness": [
-        "assertive", "passive", "aggressive", "meek", "bold",
-        "timid", "demanding", "submissive", "forceful", "gentle"
+      "assertiveness_levels": [
+        "very passive", "mild", "moderate", "assertive", "very assertive", "dominating"
+      ],
+      "warmth_levels": [
+        "very distant", "reserved", "neutral", "warm", "very warm", "effusive"
+      ],
+      "expressiveness_levels": [
+        "very restrained", "controlled", "moderate", "expressive", "very expressive", "dramatic"
       ]
     },
 
-    "cognitive_approach_modifiers": {
-      "information_processing": [
-        "analytical", "intuitive", "logical", "emotional", "systematic",
-        "spontaneous", "methodical", "impulsive", "rational", "reactive"
+    "cognitive_processing_spectrums": {
+      "analytical_depth": [
+        "surface-level", "basic analysis", "thorough", "very analytical", "extremely detailed", "obsessively precise"
       ],
-      "detail_orientation": [
-        "detail-oriented", "big-picture", "precise", "general", "specific",
-        "broad", "focused", "scattered", "thorough", "superficial"
+      "decision_speed": [
+        "very deliberate", "careful", "moderate pace", "quick", "very fast", "impulsive"
       ],
-      "decision_making": [
-        "decisive", "indecisive", "cautious", "impulsive", "deliberate",
-        "hasty", "careful", "reckless", "thoughtful", "spontaneous"
+      "detail_focus": [
+        "big-picture only", "general focus", "balanced", "detail-aware", "very detail-focused", "nitpicky"
+      ],
+      "systematic_approach": [
+        "very spontaneous", "flexible", "somewhat organized", "systematic", "very methodical", "rigidly structured"
+      ],
+      "curiosity_intensity": [
+        "mildly curious", "interested", "very curious", "highly inquisitive", "intensely fascinated"
+      ],
+      "skepticism_levels": [
+        "very trusting", "accepting", "mildly skeptical", "skeptical", "very skeptical", "cynical"
       ]
     },
 
-    "temporal_modifiers": {
-      "urgency_timing": [
-        "immediate", "gradual", "sudden", "progressive", "acute",
-        "chronic", "intermittent", "persistent", "sporadic", "constant"
+    "social_engagement_spectrums": {
+      "social_comfort_levels": [
+        "very shy", "reserved", "somewhat comfortable", "socially comfortable", "very outgoing", "attention-seeking"
       ],
-      "experience_duration": [
-        "new", "experienced", "first-time", "veteran", "novice",
-        "seasoned", "unfamiliar", "accustomed", "fresh", "practiced"
+      "collaboration_preference": [
+        "strongly independent", "prefers independence", "neutral", "collaborative", "very collaborative", "group-dependent"
       ],
-      "change_pace": [
-        "rapid", "slow", "accelerating", "stable", "fluctuating",
-        "steady", "variable", "consistent", "erratic", "predictable"
+      "interpersonal_warmth": [
+        "very distant", "professional", "neutral", "friendly", "very warm", "intimately personal"
+      ],
+      "trust_openness": [
+        "very guarded", "cautious", "somewhat open", "trusting", "very trusting", "naively open"
+      ],
+      "conflict_comfort": [
+        "conflict-avoidant", "prefers harmony", "neutral", "comfortable with disagreement", "enjoys debate", "seeks confrontation"
       ]
     },
 
-    "social_interaction_modifiers": {
-      "interpersonal_style": [
-        "collaborative", "independent", "cooperative", "competitive", "supportive",
-        "confrontational", "accommodating", "challenging", "agreeable", "difficult"
+    "energy_and_pace_spectrums": {
+      "energy_levels": [
+        "exhausted", "tired", "moderate energy", "energetic", "very energetic", "hyperactive"
       ],
-      "trust_level": [
-        "trusting", "suspicious", "open", "guarded", "transparent",
-        "secretive", "forthcoming", "reserved", "candid", "defensive"
+      "patience_levels": [
+        "extremely patient", "patient", "moderately patient", "somewhat impatient", "impatient", "explosive"
       ],
-      "social_comfort": [
-        "comfortable", "awkward", "at-ease", "tense", "relaxed",
-        "nervous", "confident", "shy", "outgoing", "introverted"
+      "urgency_perception": [
+        "very relaxed", "unhurried", "normal pace", "sense of urgency", "very urgent", "crisis mode"
+      ],
+      "response_speed": [
+        "very slow to respond", "thoughtful pace", "normal timing", "quick responses", "very rapid", "immediate reactions"
       ]
     },
 
-    "knowledge_modifiers": {
-      "expertise_level": [
-        "knowledgeable", "uninformed", "expert", "novice", "educated",
-        "naive", "sophisticated", "simple", "informed", "ignorant"
+    "knowledge_and_expertise_spectrums": {
+      "expertise_confidence": [
+        "very uncertain about knowledge", "aware of limitations", "moderately informed", "knowledgeable", "very expert", "authority figure"
       ],
-      "curiosity": [
-        "curious", "disinterested", "inquisitive", "apathetic", "engaged",
-        "bored", "fascinated", "indifferent", "eager", "reluctant"
+      "learning_eagerness": [
+        "reluctant to learn", "passive", "moderately interested", "eager to learn", "very eager", "obsessively curious"
       ],
-      "learning_style": [
-        "visual", "auditory", "hands-on", "theoretical", "practical",
-        "conceptual", "experiential", "academic", "intuitive", "systematic"
+      "information_seeking": [
+        "accepts surface info", "asks basic questions", "seeks clarification", "probes deeply", "exhaustively investigates"
       ]
     },
 
-    "physical_state_modifiers": {
-      "energy_level": [
-        "energetic", "tired", "vigorous", "fatigued", "alert",
-        "drowsy", "active", "lethargic", "dynamic", "sluggish"
+    "physical_and_comfort_spectrums": {
+      "physical_comfort": [
+        "very uncomfortable", "somewhat uncomfortable", "neutral", "comfortable", "very comfortable", "completely at ease"
       ],
-      "comfort_level": [
-        "comfortable", "uncomfortable", "relaxed", "tense", "at-ease",
-        "strained", "peaceful", "agitated", "calm", "restless"
+      "alertness_levels": [
+        "very drowsy", "tired", "neutral alertness", "alert", "very alert", "hyper-vigilant"
       ],
-      "health_perception": [
-        "healthy", "unwell", "robust", "fragile", "strong",
-        "weak", "resilient", "vulnerable", "fit", "sick"
+      "physical_presence": [
+        "very withdrawn", "subdued", "normal presence", "confident posture", "commanding presence", "dominant physical style"
       ]
     },
 
-    "cultural_background_modifiers": {
-      "communication_patterns": [
-        "direct", "contextual", "hierarchical", "egalitarian", "individual",
-        "collective", "expressive", "reserved", "formal", "informal"
+    "temporal_perspective_spectrums": {
+      "time_orientation": [
+        "very past-focused", "past-aware", "present-focused", "future-oriented", "very future-focused", "visionary"
       ],
-      "relationship_approach": [
-        "task-focused", "relationship-focused", "independent", "interdependent", "personal",
-        "professional", "warm", "distant", "familiar", "respectful"
+      "planning_preference": [
+        "very spontaneous", "flexible", "some planning", "well-planned", "highly structured", "rigidly scheduled"
+      ],
+      "change_adaptation": [
+        "very resistant to change", "prefers stability", "neutral", "adaptable", "very flexible", "thrives on change"
       ]
     },
 
-    "situational_context_modifiers": {
-      "environmental_comfort": [
-        "familiar", "unfamiliar", "comfortable", "intimidating", "welcoming",
-        "sterile", "homey", "clinical", "warm", "cold"
-      ],
-      "time_pressure": [
-        "rushed", "leisurely", "pressured", "relaxed", "hurried",
-        "unhurried", "tight", "flexible", "constrained", "open"
-      ],
-      "privacy_level": [
-        "private", "public", "confidential", "open", "personal",
-        "professional", "intimate", "formal", "secure", "exposed"
-      ]
-    },
-
-    "response_pattern_modifiers": {
-      "questioning_style": [
-        "probing", "surface-level", "follow-up", "initial", "clarifying",
-        "challenging", "supportive", "skeptical", "accepting", "critical"
-      ],
+    "response_pattern_spectrums": {
       "information_sharing": [
-        "forthcoming", "withholding", "selective", "comprehensive", "minimal",
-        "detailed", "vague", "specific", "general", "precise"
+        "very withholding", "selective", "moderate sharing", "forthcoming", "very open", "oversharing"
       ],
       "feedback_receptivity": [
-        "receptive", "resistant", "open", "closed", "flexible",
-        "rigid", "adaptive", "stubborn", "willing", "defensive"
+        "very defensive", "resistant", "somewhat open", "receptive", "very receptive", "eagerly seeks feedback"
+      ],
+      "questioning_intensity": [
+        "surface questions only", "basic inquiry", "moderate probing", "deep questioning", "very thorough", "relentlessly investigative"
+      ],
+      "emotional_expression": [
+        "very controlled", "restrained", "moderate expression", "emotionally open", "very expressive", "emotionally dramatic"
       ]
+    },
+
+    "situational_response_spectrums": {
+      "environmental_sensitivity": [
+        "completely adaptable", "flexible", "somewhat sensitive", "environmentally aware", "very sensitive", "highly reactive to environment"
+      ],
+      "privacy_preference": [
+        "very public", "open sharing", "normal boundaries", "prefers privacy", "very private", "secretive"
+      ],
+      "authority_relationship": [
+        "very deferential", "respectful", "neutral", "questions authority", "challenges authority", "rebellious"
+      ],
+      "risk_tolerance": [
+        "very risk-averse", "cautious", "moderate risk", "comfortable with risk", "risk-seeking", "reckless"
+      ]
+    },
+
+    "cultural_communication_spectrums": {
+      "hierarchy_awareness": [
+        "very egalitarian", "informal approach", "aware of roles", "respects hierarchy", "very hierarchical", "rigid about status"
+      ],
+      "context_dependency": [
+        "very direct communication", "low context", "moderate context", "context-aware", "high context", "heavily implicit"
+      ],
+      "relationship_priority": [
+        "purely task-focused", "task-oriented", "balanced", "relationship-aware", "relationship-first", "purely relational"
+      ],
+      "individual_vs_collective": [
+        "strongly individualistic", "independent", "balanced", "group-conscious", "collective-minded", "group-dependent"
+      ]
+    }
+  },
+
+  "modifier_application_rules": {
+    "complementary_combinations": [
+      ["anxious", "determined"],
+      ["confident", "detail-focused"],
+      ["very curious", "patient"],
+      ["direct", "warm"],
+      ["systematic", "flexible"]
+    ],
+    
+    "avoid_contradictions": [
+      ["confident", "very uncertain"],
+      ["patient", "explosive"],
+      ["very trusting", "cynical"],
+      ["energetic", "exhausted"],
+      ["direct", "very indirect"]
+    ],
+    
+    "intensity_matching": {
+      "description": "When selecting multiple modifiers, try to match intensity levels (e.g., don't mix 'mildly interested' with 'extremely analytical')",
+      "low_intensity": ["slightly", "mildly", "somewhat", "moderately"],
+      "high_intensity": ["very", "extremely", "intensely", "completely", "obsessively"]
+    },
+    
+    "contextual_weighting": {
+      "customer_service": ["patience_levels", "warmth_levels", "feedback_receptivity"],
+      "technical_consultation": ["expertise_confidence", "analytical_depth", "systematic_approach"],
+      "crisis_situation": ["urgency_perception", "decision_speed", "stress_levels"],
+      "casual_conversation": ["social_comfort_levels", "expressiveness_levels", "interpersonal_warmth"]
+    }
+  },
+
+  "usage_instructions": {
+    "modifier_sentence_template": "There are a number of feelings and behavioral tendencies that you currently have about this situation. Given your personality and what's happening, here are the specific traits you should try very hard to embody throughout this conversation:",
+    
+    "selection_strategy": {
+      "recommended_count": "2-4 modifiers per conversation",
+      "selection_method": "Choose from different spectrum categories to create a well-rounded personality profile",
+      "intensity_guidance": "Mix moderate and strong intensities for realistic personality depth"
+    },
+    
+    "examples": {
+      "professional_anxious": ["moderately stressed", "very analytical", "somewhat guarded", "detail-focused"],
+      "confident_helper": ["very confident", "warm", "patient", "collaborative"],
+      "overwhelmed_novice": ["very uncertain", "eager to learn", "somewhat anxious", "forthcoming"],
+      "experienced_direct": ["knowledgeable", "direct", "moderate energy", "systematic"]
     }
   }
 }
-
