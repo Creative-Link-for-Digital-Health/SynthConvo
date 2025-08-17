@@ -26,7 +26,8 @@ Generate a conversation
 
 ## TODO 
 
-+ update modifiers prompt
++ simplify interface validator
++ review modifier engine and strategies 
 + add conversation file to the diagram
 + clean vignette directory
 + add explanation for opt-in nature of gitignore files
