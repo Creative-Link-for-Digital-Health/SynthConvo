@@ -22,7 +22,8 @@ class ConversationSchema:
         self.config_path = config_path
     
     def convert_to_json_schema(self, conversation: List[Dict[str, Any]], 
-                             conversation_num: int, conversation_modifiers: Dict[str, List[str]]) -> Dict[str, Any]:
+                             conversation_num: int, conversation_modifiers: Dict[str, List[str]],
+                             actual_system_prompts: Dict[str, str]) -> Dict[str, Any]:
         """Convert internal conversation format to the structured JSON schema."""
         timestamp = datetime.now().isoformat() + "Z"
         conversation_id = f"conv_{conversation_num:03d}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -30,8 +31,12 @@ class ConversationSchema:
         # Extract persona information with modifiers reported once
         personas = self._build_personas_section(conversation_modifiers)
         
-        # Build initial system prompts section
-        initial_system_prompts = self._build_initial_system_prompts_section(conversation_modifiers)
+        # Build initial system prompts section using actual prompts from generation
+        initial_system_prompts = {}
+        for participant_id, system_prompt in actual_system_prompts.items():
+            initial_system_prompts[participant_id] = {
+                "system_prompt": system_prompt
+            }
         
         # Group conversation messages by turns
         conversation_turns = self._build_conversation_turns(conversation, personas)
@@ -55,6 +60,7 @@ class ConversationSchema:
     def _build_personas_section(self, conversation_modifiers: Dict[str, List[str]]) -> Dict[str, Any]:
         """Build the personas section with modifiers reported once per conversation."""
         personas = {}
+        initiator = self.config['conversation_parameters']['initiator']
         
         for participant_id, participant_data in self.participants.items():
             participant_config = self.config['participants'][participant_id]
@@ -63,36 +69,29 @@ class ConversationSchema:
             # Get persona name from config or generate from participant_id
             persona_name = participant_config.get('description', participant_id.replace('_', ' ').title())
             
+            # Determine role based on initiator status (simplified for JSON output)
+            is_initiator = participant_id == initiator
+            conversation_role = "initiator" if is_initiator else "responder"
+            display_role = "user" if is_initiator else "assistant"  # For display purposes
+            
             personas[participant_id] = {
                 "name": persona_name,
-                "llm_role": participant_config.get('llm_role', 'assistant'),
+                "role": display_role,  # For display in JSON
+                "conversation_role": conversation_role,
                 "persona": persona_card['persona_prompt'].get('role', persona_name),
-                "modifiers": conversation_modifiers.get(participant_id, [])  # Report modifiers once per conversation
+                "modifiers": conversation_modifiers.get(participant_id, [])
             }
         
         return personas
     
     def _build_initial_system_prompts_section(self, conversation_modifiers: Dict[str, List[str]]) -> Dict[str, Any]:
-        """Build the initial system prompts section."""
-        from .system_prompt_builder import SystemPromptBuilder
-        
-        # Create a temporary prompt builder to generate clean system prompts for documentation
-        prompt_builder = SystemPromptBuilder(self.config, self.participants, "")
-        
-        initial_system_prompts = {}
-        
-        for participant_id in self.participants.keys():
-            # Build clean system prompt for documentation purposes
-            full_system_prompt = prompt_builder.build_system_prompt(participant_id, conversation_modifiers)
-            
-            initial_system_prompts[participant_id] = {
-                "system_prompt": full_system_prompt
-            }
-        
-        return initial_system_prompts
+        """Build the initial system prompts section using the actual prompts from generation."""
+        # We'll pass in the actual system prompts from the conversation generator
+        # rather than rebuilding them here
+        return {}  # This will be populated by the calling function
     
     def _build_conversation_turns(self, conversation: List[Dict[str, Any]], personas: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Group conversation messages by turns."""
+        """Group conversation messages by turns with XML role tags."""
         conversation_turns = []
         current_turn = None
         current_turn_number = -1
@@ -114,13 +113,19 @@ class ConversationSchema:
                 }
                 current_turn_number = turn_number
             
-            # Add exchange to current turn (modifiers removed from individual exchanges)
+            # Get participant name for XML tag
+            participant_name = personas[participant]["name"]
+            
+            # Add XML role tag to content
+            tagged_content = f"<{participant_name} />{content}"
+            
+            # Add exchange to current turn with XML role tagging
             exchange = {
                 "role": role,
-                "name": personas[participant]["name"],
+                "name": participant_name,
                 "participant_id": participant,
                 "message": {
-                    "content": content
+                    "content": tagged_content
                 }
             }
             
@@ -157,17 +162,27 @@ class ConversationSchema:
             modifier_engine = ModifierEngine()
             conversation_modifiers = self._apply_modifiers_for_schema(modifier_engine)
             
-            # Convert to new JSON schema
-            conversation_json = self.convert_to_json_schema(conversation, i+1, conversation_modifiers)
+            # Get actual system prompts from debug data if available
+            actual_system_prompts = {}
+            if debug_data and 'system_prompts' in debug_data:
+                actual_system_prompts = debug_data['system_prompts']
+            
+            # Convert to new JSON schema with actual system prompts
+            conversation_json = self.convert_to_json_schema(conversation, i+1, conversation_modifiers, actual_system_prompts)
             
             with open(filepath, 'w', encoding='utf-8') as jsonfile:
                 json.dump(conversation_json, jsonfile, indent=2, ensure_ascii=False)
             
             print(f"Saved conversation to {filepath}")
             
-            # Save debug information if requested and available
+            # Only save debug JSON if requested (no text files)
             if save_debug and debug_data:
-                self._save_debug_data(debug_data, conversation, i+1, output_dir, timestamp)
+                debug_json_filename = f"conversation_{timestamp}_{i+1:03d}_debug_data.json"
+                debug_json_filepath = os.path.join(output_dir, debug_json_filename)
+                
+                with open(debug_json_filepath, 'w', encoding='utf-8') as f:
+                    json.dump(debug_data, f, indent=2, ensure_ascii=False)
+                print(f"Saved debug data to {debug_json_filepath}")
     
     def _apply_modifiers_for_schema(self, modifier_engine) -> Dict[str, List[str]]:
         """Apply modifiers specifically for schema generation."""
@@ -209,77 +224,3 @@ class ConversationSchema:
                 applied_modifiers[participant_id] = []
         
         return applied_modifiers
-    
-    def _save_debug_data(self, debug_data: Dict[str, Any], conversation: List[Dict[str, Any]], 
-                        conversation_num: int, output_dir: str, timestamp: str):
-        """Save comprehensive debug information captured during generation."""
-        
-        # Save raw debug data as JSON
-        debug_json_filename = f"conversation_{timestamp}_{conversation_num:03d}_debug_data.json"
-        debug_json_filepath = os.path.join(output_dir, debug_json_filename)
-        
-        with open(debug_json_filepath, 'w', encoding='utf-8') as f:
-            json.dump(debug_data, f, indent=2, ensure_ascii=False)
-        print(f"Saved raw debug data to {debug_json_filepath}")
-        
-        # Save modifier validation report
-        self._save_modifier_validation_report(debug_data, conversation_num, output_dir, timestamp)
-        
-        # Save human-readable debug analysis for each participant
-        for participant_id in debug_data['generation_metadata']['participant_configs'].keys():
-            debug_filename = f"conversation_{timestamp}_{conversation_num:03d}_{participant_id}_debug_analysis.txt"
-            debug_filepath = os.path.join(output_dir, debug_filename)
-            
-            with open(debug_filepath, 'w', encoding='utf-8') as f:
-                self._write_debug_analysis(f, debug_data, participant_id, conversation)
-            
-            print(f"Saved debug analysis for {participant_id} to {debug_filepath}")
-    
-    def _save_modifier_validation_report(self, debug_data: Dict[str, Any], conversation_num: int, 
-                                       output_dir: str, timestamp: str):
-        """Save detailed modifier validation and selection report."""
-        validation_filename = f"conversation_{timestamp}_{conversation_num:03d}_modifier_report.txt"
-        validation_filepath = os.path.join(output_dir, validation_filename)
-        
-        with open(validation_filepath, 'w', encoding='utf-8') as f:
-            f.write("=== MODIFIER SELECTION AND VALIDATION REPORT ===\n\n")
-            
-            conversation_modifiers = debug_data.get('conversation_modifiers', {})
-            
-            for participant_id, modifiers in conversation_modifiers.items():
-                f.write(f"PARTICIPANT: {participant_id.upper()}\n")
-                f.write("=" * 50 + "\n")
-                
-                if not modifiers:
-                    f.write("No modifiers applied to this participant.\n\n")
-                    continue
-                
-                f.write(f"Applied Modifiers: {modifiers}\n\n")
-                
-                # Note: Validation would need to be implemented here if modifier_engine is available
-                f.write("VALIDATION RESULTS:\n")
-                f.write("-" * 30 + "\n")
-                f.write("Validation requires modifier_engine instance\n")
-                
-                f.write("\n" + "=" * 70 + "\n\n")
-        
-        print(f"Saved modifier validation report to {validation_filepath}")
-    
-    def _write_debug_analysis(self, f, debug_data: Dict[str, Any], participant_id: str, conversation: List[Dict[str, Any]]):
-        """Write comprehensive debug analysis for a specific participant."""
-        f.write(f"=== COMPREHENSIVE DEBUG ANALYSIS FOR {participant_id.upper()} ===\n\n")
-        
-        # Write basic analysis structure
-        f.write("1. GENERATION OVERVIEW\n")
-        f.write("=" * 50 + "\n")
-        metadata = debug_data['generation_metadata']
-        participant_config = metadata['participant_configs'][participant_id]
-        f.write(f"Initiator: {metadata['initiator']}\n")
-        f.write(f"Turn order: {metadata['turn_order']}\n")
-        f.write(f"Participant role: {participant_config.get('llm_role', 'assistant')}\n")
-        f.write(f"Applied modifiers: {debug_data['conversation_modifiers'].get(participant_id, [])}\n")
-        f.write(f"Total turns generated: {len(debug_data['turn_snapshots'])}\n\n")
-        
-        # Additional debug sections would be implemented here
-        f.write("Debug analysis requires full implementation...\n")
-        f.write("\n" + "=" * 80 + "\n")

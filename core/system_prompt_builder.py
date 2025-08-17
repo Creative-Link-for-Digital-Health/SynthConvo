@@ -62,8 +62,10 @@ class SystemPromptBuilder:
         if conversation_role == 'initiator':
             return (
                 "CONVERSATION BEHAVIOR:\n"
-                "You are beginning this interaction. Start the conversation naturally based on your role, "
-                "personality, and the current situation. Engage authentically according to your character."
+                "You are the conversation initiator in this scenario. Start the conversation naturally "
+                "based on your role, personality, and the current situation. Engage authentically "
+                "according to your character and professional responsibilities. "
+                "Begin immediately with your first response."
             )
         else:
             return (
@@ -83,16 +85,12 @@ class SystemPromptBuilder:
     
     def needs_initiation_trigger(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> bool:
         """Check if this participant needs an initiation trigger."""
-        # Only the very first message of the conversation needs a trigger
-        if conversation_history:
-            return False
-        
-        # Check if this participant is configured to start the conversation
-        initiator = self.config['conversation_parameters']['initiator']
-        return participant_id == initiator
+        # With comprehensive system prompts, no artificial triggers needed
+        return False
     
     def get_initiation_message(self) -> Dict[str, str]:
         """Get the initiation message for conversation start."""
+        # No longer needed with direct system->assistant communication
         return {
             "role": "user", 
             "content": "Begin your interaction now, staying true to your character and the situation."
@@ -104,34 +102,32 @@ class SystemPromptBuilder:
     
     def build_message_history(self, full_conversation_history: List[Dict[str, str]], 
                             current_participant: str, system_prompt: str) -> List[Dict[str, str]]:
-        """Build message history for a participant from their perspective."""
-        participant_config = self.config['participants'][current_participant]
-        llm_role = participant_config.get('llm_role', 'assistant')
+        """Build message history from each participant's perspective with correct role assignment."""
         
         # Start with system prompt
         messages = [{"role": "system", "content": system_prompt}]
         
-        # Add the conversation history from the current participant's perspective with speaker names
+        # Add conversation history from current participant's perspective
         for historical_msg in full_conversation_history:
             hist_participant = historical_msg['participant']
             hist_content = historical_msg['content']
             
             # Get the speaker name for this message
             speaker_name = self.get_speaker_name(hist_participant)
-            
-            # Prefix content with speaker name
             prefixed_content = f"{speaker_name}: {hist_content}"
             
             if hist_participant == current_participant:
-                # This participant's own messages
-                messages.append({"role": llm_role, "content": prefixed_content})
+                # This participant's own messages appear as "assistant" 
+                messages.append({"role": "assistant", "content": prefixed_content})
             else:
-                # Other participant's messages (opposite role)
-                other_role = "user" if llm_role == "assistant" else "assistant"
-                messages.append({"role": other_role, "content": prefixed_content})
+                # Other participant's messages appear as "user"
+                messages.append({"role": "user", "content": prefixed_content})
         
-        # Add initiation trigger only if needed (first message from initiator)
-        if self.needs_initiation_trigger(current_participant, full_conversation_history):
-            messages.append(self.get_initiation_message())
+        # For the very first message from initiator, add a simple prompt to help start
+        if len(full_conversation_history) == 0 and current_participant == self.config['conversation_parameters']['initiator']:
+            messages.append({
+                "role": "user", 
+                "content": "Start the conversation based on your role and the situation described."
+            })
         
         return messages

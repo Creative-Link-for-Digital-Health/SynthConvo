@@ -103,9 +103,13 @@ class ConversationGenerator:
             for exchange_part in range(2):  # Question, then Answer
                 current_participant = turn_order[exchange_part % len(turn_order)]
                 
-                # Get participant configuration
-                participant_config = self.config['participants'][current_participant]
-                llm_role = participant_config.get('llm_role', 'assistant')
+                # Determine role based on initiator status
+                initiator = self.config['conversation_parameters']['initiator']
+                is_initiator = current_participant == initiator
+                
+                # For conversation generation, both participants act as assistants
+                # but we track their logical roles for message history building
+                determined_role = "assistant"  # Both generate as assistants
                 
                 # Build messages for current participant
                 messages = self.prompt_builder.build_message_history(
@@ -119,7 +123,8 @@ class ConversationGenerator:
                     exchange_debug = {
                         'exchange_part': exchange_part,
                         'current_participant': current_participant,
-                        'llm_role': llm_role,
+                        'determined_role': determined_role,
+                        'is_initiator': is_initiator,
                         'messages_sent_to_llm': copy.deepcopy(messages),
                         'conversation_history_length': len(full_conversation_history),
                         'system_prompt_used': system_prompts[current_participant]
@@ -130,15 +135,27 @@ class ConversationGenerator:
                 
                 # Generate response
                 try:
+                    # Debug: Log the messages being sent
+                    print(f"Generating response for {current_participant} (role: {determined_role}, initiator: {is_initiator})")
+                    print(f"Messages being sent: {len(messages)} messages")
+                    if messages:
+                        print(f"Last message role: {messages[-1]['role']}")
+                        print(f"Last message content preview: {messages[-1]['content'][:100]}...")
+                    
                     response = self.llm_provider.generate_completion(
                         messages=messages,
                         model_config=model_config
                     )
                     
-                    # Ensure we got a response
-                    if not response or not response.strip():
-                        response = f"[{participant_config.get('description', current_participant)} would respond here]"
-                        print(f"Warning: Empty response from {current_participant}, using placeholder")
+                    print(f"Response received: {response[:100]}...")
+                    
+                    # Ensure we got a response and it's not a placeholder
+                    if (not response or not response.strip() or 
+                        ("[" in response and "would respond here]" in response) or
+                        ("SOCIAL SERVICES WORKER" in response and "would respond" in response)):
+                        
+                        print(f"❌ Invalid response detected from {current_participant}")
+                        response = f"I need to think about how to respond appropriately to this situation."
                         
                 except Exception as e:
                     response = f"[Error generating response: {e}]"
@@ -157,7 +174,7 @@ class ConversationGenerator:
                 turn_data = {
                     'turn': turn,
                     'participant': current_participant,
-                    'role': llm_role,
+                    'role': determined_role,
                     'content': response.strip()
                 }
                 turn_responses.append(turn_data)

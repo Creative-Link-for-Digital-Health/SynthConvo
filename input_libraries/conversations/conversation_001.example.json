@@ -7,7 +7,6 @@
     "participants": {
       "participant_a": {
         "description":"SOCIAL SERVICES CLIENT",
-        "llm_role": "assistant",
         "persona_file": "../personas/social_services_client_persona_001.example.json",
         "apply_modifiers": true,
         "applied_modifiers": [
@@ -18,7 +17,6 @@
       },
       "participant_b": {
         "description":"SOCIAL SERVICES WORKER",
-        "llm_role": "user",
         "persona_file": "../personas/social_services_worker_persona_001.example.json", 
         "apply_modifiers": false,
         "applied_modifiers": null
