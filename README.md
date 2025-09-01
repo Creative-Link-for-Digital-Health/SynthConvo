@@ -1,20 +1,21 @@
-# Conversation Generator - Question/Answer Turns for Model Eval and Fine-tuning
+# Synthetic Conversation Generator
 
-Use for generating synthetic conversations for system testing, development, finetuning, training and all sorts of other tasks where synthetic personas conversing with each other are useful ;)
+Use for generating synthetic conversations for system testing, development, finetuning, training robots and humans and all sorts of other tasks where synthetic personas conversing with each other are useful ;)
 
 ![alt text](assets/synth_convo_diagram.png)
 
 ## Description
 The process begins with a Vignette (Conversation Context) - a predefined scenario or setting that establishes the conversational framework and context for the synthetic dialogue. Store your vignette in the `vignette_library` directory.
 
-*Persona Generation:* The vignette feeds into two distinct Persona Cards (A and B), which define specific LLM and Prompt. These cards define the characteristics, roles, and behavioral patterns of the two conversation participants. The choice of different models allows us additional flexibility. For example, using abliterated or specially fine-tuned local models to get closer to the persona parameters that we want.
+*Persona Generation:* The vignette uses two distinct Persona Cards (A and B), which define specific LLM and Prompt. The choice of different models allows us additional flexibility. For example, using abliterated or specially fine-tuned local models to get closer to the persona parameters that we want or testing specific completion API.
 
 Both persona cards feed into the gen_conversations script, which orchestrates the actual dialogue generation between the two synthetic personas based on their defined characteristics and the original vignette context.
 
-The script produces a Conversation File (CSV) containing the generated dialogue exchanges.
+The script produces a Conversation File (JSON) containing the generated dialogue exchanges.
 
-*Dataset Compilation Step:* The conversation files can be processed through the `gen_train_dataset` script, which consolidates multiple conversation files into a structured format.
-The pipeline culminates in a training dataset - a comprehensive collection of synthetic conversations formatted for machine learning model training, fine-tuning, or evaluation purposes.
+## Setup
+
+Create `secrets.toml` file following the example provided in `secrets.example.toml`. Add your API endpoints and keys to this file.  
 
 ## Generation Process
 
@@ -36,21 +37,9 @@ Generate a conversation
 + add testing for topic collapse 
 + refactor gen_train_dataset script to output to multiple training formats
 
-## Single Conversation from a Vignette 
-To process a single conversation, point the script at the specific vignette in the vignette library. 
-
-`python gen_conversations.py --mode file --path ./vignette_library/choose_vignette.txt --turns 7 --times 2`
-
-To process a list of files, point the scripts at the csv fomatted list of the vignettes
-
-`python gen_conversations.py --mode csv --path ./vignette_library/vignette_list.csv --turns 2 --times 3`
-
-You can run the batching script in two modes: file or csv --> 'file' for single file, 'csv' for processing files listed in a CSV
-Use `--turns` flag to specify number of question and answer turns the speakers take within a generated dialog.
-Use `--times` flag to specify how many times the specific vignette will be used to generate a dialog 
-
 
 ## Training dataset generator
+-- rewrite me ---
 
 Default behavior (no history, default timestamped output file.) All of the content in *output* directory located in distinct synthetic conversation CSV filews is packed into a single JSON file for traing an LLM or LoRA.
 `python gen_train_dataset.py`
@@ -62,6 +51,7 @@ Specify input and custom base name for output (no history)
 `python gen_train_dataset.py -i /path/to/csv/files -o my_custom_training_data.json`
 
 #### Todo:
+-- rewrite me ---
 Generate data with history (timestamped output file)
 `python gen_train_dataset.py --history`
 
