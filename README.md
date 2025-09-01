@@ -28,7 +28,6 @@ Generate a conversation
 
 + simplify interface validator
 + review modifier engine and strategies 
-+ add conversation file to the diagram
 + clean vignette directory
 + add explanation for opt-in nature of gitignore files
 + add human eval interface for realism

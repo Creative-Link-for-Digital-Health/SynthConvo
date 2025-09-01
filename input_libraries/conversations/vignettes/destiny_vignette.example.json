@@ -1,0 +1,42 @@
+{
+  "vignette_card": {
+    "title": "Destiny - Outpatient Care",
+    "created_at": "2025-08-21",
+    "version": "0.1.0",
+
+    "content": {
+      "vignette_file": "./content_files/destiny_vignette_content.example.txt",
+      "domain": "social services"
+    },
+
+    "copyright": {
+      "author": "Dr. Example",
+      "license": "MIT",
+      "usage_permissions": {
+        "commercial_use": true,
+        "distribution": true,
+        "modification": true,
+        "attribution_required": true
+      },
+      "copyright_notice": "© 2025 Dr. Example. Redistribution and modification allowed under MIT license.",
+      "contact_email": "example@example.org"
+    },
+
+    "metadata": {
+      "created_by": "Dmitry Strakovsky",
+      "language": "en-US",
+      "ethical_clearance": true,
+      "tags": ["outpatient", "adolescent", "crisis", "psychiatric"],
+      "citation_info": {
+        "preferred_citation": "Example, S. (2025). Example Title [Training vignette]. Repository, v0.2.0.",
+        "doi": "10.1234/sstr.marcus.001 (if available)",
+        "repository_name": "Social Services Training Repository",
+        "permanent_url": "https://github.com/Creative-Link-for-Digital-Health/SynthConvo/blob/main/input_libraries/conversations/vignettes/marcus_vignette.example.json",
+        "suggested_keywords": ["foster care training", "crisis intervention", "adolescent mental health"],
+        "citation_note": "Please cite when using this vignette in research, training materials, or publications."
+      },
+      "notes": "This is an example metadata structure.",
+      "compliance_notes": "Synthetic data only."
+    }
+  }
+}
