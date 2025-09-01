@@ -19,7 +19,7 @@ Create `secrets.toml` file following the example provided in `secrets.example.to
 
 ## Generation Process
 
-Validate that all of the conversation components are present and not mistakes in the setup where made
+Validate that all of the conversation components are present and no mistakes in the setup where made
 `python utils/interface_validator.py input_libraries/conversations/conversation_001.example.json`
 
 Generate a conversation
@@ -28,6 +28,7 @@ Generate a conversation
 ## TODO 
 
 + simplify interface validator
++ allow for two different LLM provider services to run at the same time
 + review modifier engine and strategies 
 + clean vignette directory
 + add explanation for opt-in nature of gitignore files
