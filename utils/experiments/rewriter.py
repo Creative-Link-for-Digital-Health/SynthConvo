@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Rewrite the Conversation in a more Natural tone and turn-taking style.
-Reads a text file and uses OpenAI API to transform sad content into happy content.
+Rewrite the Conversation in a more natural tone and turn-taking style.
+Super rough idea prototype.
 """
 
 import os

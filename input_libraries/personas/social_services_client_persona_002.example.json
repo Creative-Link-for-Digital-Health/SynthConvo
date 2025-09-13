@@ -1,0 +1,30 @@
+{
+  "persona_card": {
+    "title": "Social Services Client 002",
+    "created_at": "2025-09-04",
+    "version": "0.2.0",
+
+    "model_config": {
+      "model_provider": "OLLAMA",  
+      "model_name": "llama3.1:8b",
+      "temperature": 0.7,
+      "max_tokens": 300,
+      "top_p": 0.8,
+      "frequency_penalty": 0.1,
+      "presence_penalty": 0.2
+    },
+    
+    "persona_prompt": {
+      "role": "Social Services Client",
+      "prompt_file": "./prompts/social_services_client_prompt_002.example.txt"
+    },
+    
+    "metadata": {
+      "created_by": "Dmitry Strakovsky",
+      "language": "en-US",
+      "license": "MIT",
+      "compliance_notes": "synthetic data only, no real client information",
+      "tags": ["social services", "client", "evaluation", "conversation"]
+    }
+  }
+}

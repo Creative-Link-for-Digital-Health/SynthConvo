@@ -1,0 +1,46 @@
+{
+  "conversation_card": {
+    "title": "Outpatient Care - Destiny Case",
+    "created_at": "2025-08-21",
+    "version": "0.1.0",
+    
+    "participants": {
+      "participant_a": {
+        "description":"SOCIAL SERVICES CLIENT",
+        "persona_file": "../personas/social_services_client_persona_002.example.json",
+        "apply_modifiers": true,
+        "applied_modifiers": [
+          "emotional_intensity_spectrums",
+          "communication_intensity_spectrums", 
+          "social_engagement_spectrums"
+        ]
+      },
+      "participant_b": {
+        "description":"SOCIAL SERVICES WORKER",
+        "persona_file": "../personas/social_services_worker_persona_001.example.json", 
+        "apply_modifiers": false,
+        "applied_modifiers": null
+      }
+    },
+
+    "scenario": {
+      "vignette_file": "./vignettes/destiny_vignette.example.json",
+      "domain": "social services"
+    },
+
+    "conversation_parameters": {
+      "initiator": "participant_b"
+    },
+
+    "modifier_config": {
+      "modifiers_file": "../modifiers.json"
+    },
+
+    "metadata": {
+      "created_by": "Dmitry Strakovsky",
+      "description": "Conversation simulating an initial assessment for a social services client", 
+      "language": "en-US",
+      "tags": ["intake", "social services", "assessment"]
+    }
+  }
+}
