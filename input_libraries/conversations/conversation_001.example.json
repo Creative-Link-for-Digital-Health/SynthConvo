@@ -24,7 +24,7 @@
     },
 
     "scenario": {
-      "vignette_file": "./vignettes/marcus_vignette.example.json",
+      "vignette_file": "../vignettes/marcus_vignette.example.json",
       "domain": "social services"
     },
 

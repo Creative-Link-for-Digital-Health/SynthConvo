@@ -2,8 +2,6 @@
 Core conversation generator.
 
 Main orchestration logic for generating synthetic conversations with role flexibility.
-Coordinates between file loading, system prompt building, modifier application,
-and conversation schema output.
 """
 
 import copy
