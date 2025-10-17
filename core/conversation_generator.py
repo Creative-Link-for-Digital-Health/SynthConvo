@@ -25,6 +25,7 @@ class ConversationGenerator:
         
         # Initialize components
         self.file_loader = FileLoader(conversation_config_path)
+        # Initialize with a default provider, but will switch as needed per participant
         self.llm_provider = LLMProvider()
         self.modifier_engine = ModifierEngine()
         
@@ -102,7 +103,6 @@ class ConversationGenerator:
                 current_participant = turn_order[exchange_part % len(turn_order)]
                 
                 # Determine role based on initiator status
-                initiator = self.config['conversation_parameters']['initiator']
                 is_initiator = current_participant == initiator
                 
                 # For conversation generation, both participants act as assistants
@@ -131,18 +131,25 @@ class ConversationGenerator:
                 # Get model config
                 model_config = self._get_model_config(current_participant)
                 
+                # Extract model provider if specified in the model config
+                provider_name = model_config.get('model_provider')
+                model_name = model_config.get('model_name', 'llama3.1:8b')
+                
                 # Generate response
                 try:
                     # Debug: Log the messages being sent
                     print(f"Generating response for {current_participant} (role: {determined_role}, initiator: {is_initiator})")
+                    print(f"Using model: {model_name} with provider: {provider_name or 'default'}")
                     print(f"Messages being sent: {len(messages)} messages")
                     if messages:
                         print(f"Last message role: {messages[-1]['role']}")
                         print(f"Last message content preview: {messages[-1]['content'][:100]}...")
                     
+                    # Pass provider_name to generate_completion
                     response = self.llm_provider.generate_completion(
                         messages=messages,
-                        model_config=model_config
+                        model_config=model_config,
+                        provider_name=provider_name  # Now using provider from persona
                     )
                     
                     print(f"Response received: {response[:100]}...")
@@ -164,6 +171,8 @@ class ConversationGenerator:
                     exchange_debug.update({
                         'response_received': response.strip(),
                         'model_config_used': copy.deepcopy(model_config),
+                        'model_used': model_name,
+                        'provider_used': provider_name,
                         'generation_timestamp': datetime.now().isoformat()
                     })
                     turn_debug_info['exchanges'].append(exchange_debug)
