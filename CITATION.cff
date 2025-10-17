@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Strakovsky"
+    given-names: "Dmitry"
+    nickname: "Dima"
+
+title: "SynthConvo: Synthetic Conversation Generator for Human training, Eval and Fine-tuning tasks"
+version: 0.3.0
+date-released: 2025-07-01
+url: "https://github.com/Creative-Link-for-Digital-Health/SynthConvo"
+repository-code: "https://github.com/Creative-Link-for-Digital-Health/SynthConvo"
+abstract: "A tool for generating synthetic conversations for system testing, development, finetuning, training of humans and robots, and all sorts of other tasks where synthetic personas conversing with each other are useful."
+keywords:
+  - synthetic data
+  - conversation generation
+  - fine-tuning
+  - human training
+  - LLM training
+license: GPL-3.0
