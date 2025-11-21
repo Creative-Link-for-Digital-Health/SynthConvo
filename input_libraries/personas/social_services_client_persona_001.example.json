@@ -23,6 +23,13 @@
       "created_by": "Dmitry Strakovsky",
       "language": "en-US",
       "license": "MIT",
+      "citation_info": {
+        "citation_note": "Please cite when using this vignette in research, training materials, or publications.",
+        "preferred_citation": "Example, S. (2025). Example Title [Training vignette]. Repository, v0.2.0.",
+        "doi": "10.1234/sstr.persona.001 (if available)",
+        "repository_name": "Social Services Training Repository",
+        "permanent_url": "https://github.com/Creative-Link-for-Digital-Health/SynthConvo/blob/main/input_libraries/conversations/vignettes/marcus_vignette.example.json"
+      },
       "compliance_notes": "synthetic data only, no real client information",
       "tags": ["social services", "client", "evaluation", "conversation"]
     }
