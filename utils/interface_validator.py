@@ -580,6 +580,43 @@ class InterfaceValidator:
             self.validation_results.append("   (Advanced validation requires running conversation generation)")
         else:
             self.validation_results.append("✅ No participants use modifiers - no combination validation needed")
+    @staticmethod
+    def print_validation_results(messages: List[str]) -> None:
+        """
+        Print validation results with formatting.
+        
+        Args:
+            messages: List of validation messages to print
+        """
+        print("🔍 Interface Validation Results:")
+        print("=" * 80)
+        
+        # Print results with better formatting
+        current_section = ""
+        for message in messages:
+            if message.startswith("\n---"):
+                current_section = message.strip()
+                print(f"\n{current_section}")
+                print("-" * (len(current_section) - 4))
+            elif message.startswith("---"):
+                current_section = message.strip()
+                print(f"\n{current_section}")
+                print("-" * len(current_section))
+            else:
+                print(message)
+        
+        print("\n" + "=" * 80)
+        
+        # Summary with counts
+        errors = [msg for msg in messages if msg.startswith("❌")]
+        warnings = [msg for msg in messages if msg.startswith("⚠️")]
+        successes = [msg for msg in messages if msg.startswith("✅")]
+        
+        print(f"\n📊 VALIDATION SUMMARY:")
+        print(f"   ✅ Successes: {len(successes)}")
+        print(f"   ⚠️  Warnings: {len(warnings)}")
+        print(f"   ❌ Errors: {len(errors)}")
+
 
 
 def validate_conversation_interface(config_path: str) -> Tuple[bool, List[str]]:
@@ -595,64 +632,3 @@ def validate_conversation_interface(config_path: str) -> Tuple[bool, List[str]]:
     validator = InterfaceValidator(config_path)
     return validator.validate_all()
 
-
-# Example usage
-if __name__ == "__main__":
-    import sys
-    
-    if len(sys.argv) != 2:
-        print("Usage: python interface_validator.py <conversation_config_path>")
-        print("\nThis validator checks:")
-        print("  ✅ Configuration file structure and syntax")
-        print("  ✅ Participant personas and their dependencies") 
-        print("  ✅ Vignette files and content quality")
-        print("  ✅ Modifier categories and application rules")
-        print("  ✅ Conversation logic and role consistency")
-        print("  ✅ Modifier combination validation (if engine available)")
-        sys.exit(1)
-    
-    config_path = sys.argv[1]
-    
-    print("🔍 Interface Validation Results:")
-    print("=" * 80)
-    
-    validator = InterfaceValidator(config_path)
-    is_valid, messages = validator.validate_all()
-    
-    # Print results with better formatting
-    current_section = ""
-    for message in messages:
-        if message.startswith("\n---"):
-            current_section = message.strip()
-            print(f"\n{current_section}")
-            print("-" * (len(current_section) - 4))
-        elif message.startswith("---"):
-            current_section = message.strip()
-            print(f"\n{current_section}")
-            print("-" * len(current_section))
-        else:
-            print(message)
-    
-    print("\n" + "=" * 80)
-    
-    # Summary with counts
-    errors = [msg for msg in messages if msg.startswith("❌")]
-    warnings = [msg for msg in messages if msg.startswith("⚠️")]
-    successes = [msg for msg in messages if msg.startswith("✅")]
-    
-    print(f"\n📊 VALIDATION SUMMARY:")
-    print(f"   ✅ Successes: {len(successes)}")
-    print(f"   ⚠️  Warnings: {len(warnings)}")
-    print(f"   ❌ Errors: {len(errors)}")
-    
-    if is_valid:
-        print(f"\n🎉 Validation PASSED! Ready for conversation generation.")
-        if warnings:
-            print(f"   Note: {len(warnings)} warnings found - review for optimal results")
-        sys.exit(0)
-    else:
-        print(f"\n💥 Validation FAILED!")
-        print(f"   Fix {len(errors)} error(s) before proceeding with generation")
-        if warnings:
-            print(f"   Also consider addressing {len(warnings)} warning(s)")
-        sys.exit(1)

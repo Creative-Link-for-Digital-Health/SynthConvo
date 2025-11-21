@@ -4,7 +4,7 @@ Handles communication with OpenAI-compatible LLM endpoints
 Configured via .secrets.toml file in the root directory
 """
 import sys
-import toml
+import tomllib
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 
@@ -23,8 +23,8 @@ class LLMProvider:
     def _load_config(self, secrets_path: str) -> Dict[str, Dict[str, str]]:
         """Load API configuration from secrets file with multiple providers."""
         try:
-            with open(secrets_path, 'r') as f:
-                secrets = toml.load(f)
+            with open(secrets_path, 'rb') as f:
+                secrets = tomllib.load(f)
             
             # Validate each provider has required keys
             for provider, config in secrets.items():

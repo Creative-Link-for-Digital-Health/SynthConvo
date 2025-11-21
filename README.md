@@ -19,18 +19,18 @@ Create `secrets.toml` file following the example provided in `secrets.example.to
 
 ## Generation Process
 
-Validate that all of the conversation components are present and no mistakes in the setup where made
-`python utils/interface_validator.py input_libraries/conversations/conversation_001.example.json`
+Validate that all of the conversation components are present and no mistakes in the setup were made (Dry Run)
+`python gen_conversations.py --config input_libraries/conversations/conversation_001.example.json --check-interfaces`
 
 Generate a conversation
-`python gen_conversations.py --config input_libraries/conversations/conversation_001.example.json --turns 3 --count 2 --output-dir outputs/test_run --debug-prompts`
+`python gen_conversations.py --config input_libraries/conversations/conversation_001.example.json --turns 3 --count 2 --output-dir outputs/test_run --debug`
 
 ## TODO 
 
-+ simplify interface validator
++ [x] simplify interface validator
 + allow for two different LLM provider services to run at the same time
 + review modifier engine and strategies 
-+ clean vignette directory
++ [x)clean vignette directory
 + add explanation for opt-in nature of gitignore files
 + add human eval interface for realism
 + add token length param and test it with longer synthetic conversations

@@ -44,6 +44,12 @@ Examples:
     )
     
     parser.add_argument(
+        "--dry-run", 
+        action="store_true",
+        help="Alias for --check-interfaces"
+    )
+    
+    parser.add_argument(
         "-t", "--turns", 
         type=int, 
         default=5,
@@ -70,23 +76,21 @@ Examples:
     
     args = parser.parse_args()
     
+    # Handle dry-run alias
+    if args.dry_run:
+        args.check_interfaces = True
+    
     # Validate arguments
     if not args.check_interfaces and not args.output_dir:
         parser.error("--output-dir is required unless using --check-interfaces")
     
     try:
         # Always run interface validation first
-        print("🔍 Validating conversation interfaces...")
-        print("=" * 60)
-        
         validator = InterfaceValidator(args.config)
         is_valid, messages = validator.validate_all()
         
-        # Print validation results
-        for message in messages:
-            print(message)
-        
-        print("=" * 60)
+        # Print validation results using the shared formatter
+        InterfaceValidator.print_validation_results(messages)
         
         # If only checking interfaces, exit here
         if args.check_interfaces:
