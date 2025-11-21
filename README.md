@@ -9,7 +9,9 @@ The process begins with a Vignette (Conversation Context) - a predefined scenari
 
 *Persona Generation:* The vignette uses two distinct Persona Cards (A and B), which define specific LLM and Prompt. The choice of different models allows us additional flexibility. For example, using abliterated or specially fine-tuned local models to get closer to the persona parameters that we want or testing specific completion API.
 
-Both persona cards feed into the gen_conversations script, which orchestrates the actual dialogue generation between the two synthetic personas based on their defined characteristics and the original vignette context.
+*Modifier Engine:* To ensure dynamic and varied interactions, the system uses a Modifier Engine that injects specific behavioral traits into the personas. [Read more about the Modifier Engine](MODIFIER_ENGINE.md).
+
+Both persona cards feed into the gen_conversations script, which orchestrates the actual dialogue generation between the two synthetic personas based on their defined characteristics and the original vignette context. The script also uses the modifier engine to inject modifiers into the personas based on the `modifier_config` in the conversation card.
 
 The script produces a Conversation File (JSON) containing the generated dialogue exchanges.
 
@@ -28,9 +30,10 @@ Generate a conversation
 ## TODO 
 
 + [x] simplify interface validator
-+ allow for two different LLM provider services to run at the same time
-+ review modifier engine and strategies 
-+ [x)clean vignette directory
++ [x] allow for two different LLM provider services to run at the same time
++ [x] review modifier engine and strategies 
++ [x] clean vignette directory
++ add validation_criteria capability to persona cards
 + add explanation for opt-in nature of gitignore files
 + add human eval interface for realism
 + add token length param and test it with longer synthetic conversations
@@ -41,6 +44,7 @@ Generate a conversation
 
 ## Training dataset generator
 -- rewrite me ---
+REWORKING THIS WHOLE SECTION!!!
 
 Default behavior (no history, default timestamped output file.) All of the content in *output* directory located in distinct synthetic conversation CSV filews is packed into a single JSON file for traing an LLM or LoRA.
 `python gen_train_dataset.py`

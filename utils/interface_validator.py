@@ -288,16 +288,6 @@ class InterfaceValidator:
         else:
             self.validation_results.append(f"⚠️ {participant_id}: No description provided")
         
-        # Check LLM role
-        if 'llm_role' in participant_config:
-            llm_role = participant_config['llm_role']
-            if llm_role in ['user', 'assistant']:
-                self.validation_results.append(f"✅ {participant_id}: LLM role: {llm_role}")
-            else:
-                self.validation_results.append(f"❌ {participant_id}: Invalid llm_role '{llm_role}' (must be 'user' or 'assistant')")
-        else:
-            self.validation_results.append(f"⚠️ {participant_id}: No llm_role specified (will use default)")
-        
         # Check modifier configuration
         apply_modifiers = participant_config.get('apply_modifiers', False)
         if apply_modifiers:
@@ -542,20 +532,6 @@ class InterfaceValidator:
                 self.validation_results.append(f"   Available participants: {', '.join(participants.keys())}")
         else:
             self.validation_results.append("❌ No initiator specified in conversation_parameters")
-        
-        # Check LLM role distribution
-        llm_roles = {}
-        for participant_id, config in participants.items():
-            role = config.get('llm_role', 'assistant')
-            if role not in llm_roles:
-                llm_roles[role] = []
-            llm_roles[role].append(participant_id)
-        
-        if len(llm_roles) == 1:
-            self.validation_results.append("⚠️ All participants have the same LLM role - conversation may be one-sided")
-        else:
-            for role, participant_list in llm_roles.items():
-                self.validation_results.append(f"✅ LLM role '{role}': {', '.join(participant_list)}")
     
     def _validate_modifier_combinations(self):
         """Validate modifier combinations using the modifier engine if available."""

@@ -3,44 +3,45 @@
     "title": "Social Services Initial Assessment - Marcus Case",
     "created_at": "2025-08-09",
     "version": "0.1.0",
-    
     "participants": {
       "participant_a": {
-        "description":"SOCIAL SERVICES CLIENT",
+        "description": "SOCIAL SERVICES CLIENT",
         "persona_file": "../personas/social_services_client_persona_001.example.json",
         "apply_modifiers": true,
         "applied_modifiers": [
           "emotional_intensity_spectrums",
-          "communication_intensity_spectrums", 
+          "communication_intensity_spectrums",
           "social_engagement_spectrums"
         ]
       },
       "participant_b": {
-        "description":"SOCIAL SERVICES WORKER",
-        "persona_file": "../personas/social_services_worker_persona_001.example.json", 
+        "description": "SOCIAL SERVICES WORKER",
+        "persona_file": "../personas/social_services_worker_persona_001.example.json",
         "apply_modifiers": false,
         "applied_modifiers": null
       }
     },
-
     "scenario": {
       "vignette_file": "../vignettes/marcus_vignette.example.json",
       "domain": "social services"
     },
-
     "conversation_parameters": {
       "initiator": "participant_b"
     },
-
     "modifier_config": {
-      "modifiers_file": "../modifiers.json"
+      "modifiers_file": "../modifiers.json",
+      "personality_coherence": "balanced",
+      "target_modifier_count": 3
     },
-
     "metadata": {
       "created_by": "Dmitry Strakovsky",
-      "description": "Conversation simulating an initial assessment for a social services client", 
+      "description": "Conversation simulating an initial assessment for a social services client",
       "language": "en-US",
-      "tags": ["intake", "social services", "assessment"]
+      "tags": [
+        "intake",
+        "social services",
+        "assessment"
+      ]
     }
   }
 }
